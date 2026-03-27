@@ -1,12 +1,21 @@
-# React + Vite
+# SkillSquare Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+SkillSquare Frontend is the web interface for the SkillSquare platform, built to provide a smooth and modern user experience.
 
-Currently, two official plugins are available:
+## Live Link
+[Live Demo](https://skill-square-frontend.vercel.app)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Project Status
+Working on it right now.
 
-## Expanding the ESLint configuration
+## Overview
+This project is currently in active development. New features, UI improvements, and backend integrations are being worked on continuously.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Tech Stack
+- React
+- Vite
+- JavaScript
+- CSS
+
+## Development Note
+This repository contains the frontend side of the SkillSquare project. Further updates will be pushed regularly.
