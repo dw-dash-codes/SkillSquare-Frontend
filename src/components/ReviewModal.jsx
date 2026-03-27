@@ -1,34 +1,32 @@
 import React, { useState, useEffect } from "react";
-import api from "../services/api"; 
-import { getBookingDetails } from "../services/api"; 
+import api from "../services/api";
+import { getBookingDetails } from "../services/api";
 import ModalAlert from "./ModalAlert";
 
 const ReviewModal = ({ isOpen, onClose, bookingId, onSuccess }) => {
   const [rating, setRating] = useState(0);
   const [hover, setHover] = useState(0);
   const [comment, setComment] = useState("");
-  
-  // States for fetching booking info
+
   const [loading, setLoading] = useState(false);
   const [fetchingDetails, setFetchingDetails] = useState(true);
   const [bookingInfo, setBookingInfo] = useState(null);
 
-  // 👈 Modal Alert State
   const [modalConfig, setModalConfig] = useState({
     isOpen: false,
     type: "",
     title: "",
     message: "",
     actions: [],
-    onCloseCallback: null // Special callback to close the main modal after success
+    onCloseCallback: null,
   });
 
   useEffect(() => {
     if (isOpen && bookingId) {
       loadBookingInfo();
     } else {
-      // Clear the form when modal closes
       setRating(0);
+      setHover(0);
       setComment("");
       setBookingInfo(null);
     }
@@ -46,17 +44,14 @@ const ReviewModal = ({ isOpen, onClose, bookingId, onSuccess }) => {
     }
   };
 
-  // Handle closing the Alert Modal
   const closeAlert = () => {
     setModalConfig((prev) => ({ ...prev, isOpen: false }));
-    // If there is a special callback (like closing the main modal), run it
     if (modalConfig.onCloseCallback) {
       modalConfig.onCloseCallback();
     }
   };
 
   const handleSubmit = async () => {
-    // Validation Alert
     if (rating === 0) {
       setModalConfig({
         isOpen: true,
@@ -64,7 +59,7 @@ const ReviewModal = ({ isOpen, onClose, bookingId, onSuccess }) => {
         title: "Rating Required",
         message: "Please select a star rating before submitting! ⭐",
         actions: [{ label: "OK" }],
-        onCloseCallback: null
+        onCloseCallback: null,
       });
       return;
     }
@@ -77,11 +72,10 @@ const ReviewModal = ({ isOpen, onClose, bookingId, onSuccess }) => {
         comment: comment,
       });
 
-      // Reset State
       setRating(0);
+      setHover(0);
       setComment("");
-      
-      // 👈 Success Alert
+
       setModalConfig({
         isOpen: true,
         type: "success",
@@ -89,23 +83,24 @@ const ReviewModal = ({ isOpen, onClose, bookingId, onSuccess }) => {
         message: "Review submitted successfully! 🎉",
         actions: [{ label: "Done" }],
         onCloseCallback: () => {
-          if (onSuccess) onSuccess(); 
-          onClose(); // Close the main Review modal after they click "Done"
-        }
+          if (onSuccess) onSuccess();
+          onClose();
+        },
       });
-
     } catch (error) {
       console.error(error);
-      const errorMsg = error.response?.data?.message || error.response?.data || "Something went wrong.";
-      
-      // 👈 Error Alert
+      const errorMsg =
+        error.response?.data?.message ||
+        error.response?.data ||
+        "Something went wrong.";
+
       setModalConfig({
         isOpen: true,
         type: "error",
         title: "Submission Failed",
         message: errorMsg,
         actions: [{ label: "Try Again" }],
-        onCloseCallback: null
+        onCloseCallback: null,
       });
     } finally {
       setLoading(false);
@@ -116,54 +111,48 @@ const ReviewModal = ({ isOpen, onClose, bookingId, onSuccess }) => {
 
   return (
     <>
-      {/* 1. Backdrop for Review Modal */}
-      <div 
-        className="modal-backdrop show" 
-        style={{ backgroundColor: "rgba(0,0,0,0.75)", position: "fixed", top: 0, left: 0, width: "100%", height: "100%", zIndex: 1040 }}
-      ></div>
+      <div className="review-modal-backdrop" onClick={onClose}></div>
 
-      {/* 2. Review Modal Container */}
-      <div 
-        className="modal d-block show" 
-        tabIndex="-1" 
-        style={{ zIndex: 1050, opacity: 1 }}
+      <div
+        className="modal d-block review-modal-wrapper"
+        tabIndex="-1"
+        role="dialog"
+        aria-modal="true"
       >
         <div className="modal-dialog modal-dialog-centered">
-          <div className="modal-content shadow-lg border-0 rounded-4 bg-white">
-            
-            {/* Header */}
-            <div className="modal-header bg-primary text-white border-0 rounded-top-4">
+          <div className="modal-content border-0 review-modal-card">
+            <div className="modal-header review-modal-header border-0">
               <h5 className="modal-title fw-bold">
-                <i className="fas fa-star me-2 text-warning"></i> Rate Your Experience
+                <i className="fas fa-star me-2 text-warning"></i>
+                Rate Your Experience
               </h5>
               <button
                 type="button"
                 className="btn-close btn-close-white"
                 onClick={onClose}
+                aria-label="Close"
               ></button>
             </div>
 
-            {/* Body */}
-            <div className="modal-body p-4 text-center bg-white">
-              
-              {/* Dynamic Booking Info Section */}
+            <div className="modal-body p-4 text-center">
               {fetchingDetails ? (
                 <div className="spinner-border text-primary my-3" role="status">
                   <span className="visually-hidden">Loading...</span>
                 </div>
               ) : bookingInfo ? (
-                <div className="bg-light p-3 rounded-3 mb-4 text-start border shadow-sm">
+                <div className="review-booking-info text-start mb-4">
                   <h6 className="fw-bold mb-1 text-primary">
                     {bookingInfo.serviceCategory} Service
                   </h6>
                   <p className="mb-1 small">
                     <strong>Provider:</strong> {bookingInfo.providerName}
                   </p>
-                  <p className="mb-1 small text-muted">
+                  <p className="mb-1 small text-secondary">
                     <strong>Task:</strong> {bookingInfo.taskDescription}
                   </p>
-                  <p className="mb-0 small text-muted">
-                    <i className="far fa-calendar-alt me-1"></i> {bookingInfo.date}
+                  <p className="mb-0 small text-secondary">
+                    <i className="far fa-calendar-alt me-1"></i>
+                    {bookingInfo.date}
                   </p>
                 </div>
               ) : (
@@ -172,19 +161,20 @@ const ReviewModal = ({ isOpen, onClose, bookingId, onSuccess }) => {
 
               <h5 className="mb-3 text-dark fw-bold">How did they do?</h5>
 
-              {/* Interactive Stars */}
-              <div className="d-flex justify-content-center mb-4 gap-2">
+              <div className="review-stars-wrap mb-4">
                 {[...Array(5)].map((_, index) => {
                   const ratingValue = index + 1;
+                  const active = ratingValue <= (hover || rating);
+
                   return (
                     <button
                       key={ratingValue}
                       type="button"
-                      className="btn btn-link p-0 text-decoration-none border-0 bg-transparent"
+                      className={`review-star-btn ${active ? "active" : ""}`}
                       onClick={() => setRating(ratingValue)}
                       onMouseEnter={() => setHover(ratingValue)}
                       onMouseLeave={() => setHover(rating)}
-                      style={{ fontSize: "2.5rem", color: ratingValue <= (hover || rating) ? "#ffc107" : "#e4e5e9", transition: "color 0.2s" }}
+                      aria-label={`Rate ${ratingValue} star${ratingValue > 1 ? "s" : ""}`}
                     >
                       ★
                     </button>
@@ -192,11 +182,12 @@ const ReviewModal = ({ isOpen, onClose, bookingId, onSuccess }) => {
                 })}
               </div>
 
-              {/* Comment Box */}
               <div className="text-start">
-                <label className="form-label fw-bold text-dark">Write a Review (Optional)</label>
+                <label className="form-label auth-label">
+                  Write a Review (Optional)
+                </label>
                 <textarea
-                  className="form-control bg-light"
+                  className="form-control auth-input auth-textarea review-comment-box"
                   rows="3"
                   placeholder="Tell us what you liked about the service..."
                   value={comment}
@@ -205,35 +196,35 @@ const ReviewModal = ({ isOpen, onClose, bookingId, onSuccess }) => {
               </div>
             </div>
 
-            {/* Footer */}
-            <div className="modal-footer border-0 bg-light rounded-bottom-4">
+            <div className="modal-footer review-modal-footer border-0">
               <button
-                className="btn btn-secondary px-4"
+                className="btn btn-outline-secondary rounded-pill px-4"
                 onClick={onClose}
                 disabled={loading}
               >
                 Cancel
               </button>
               <button
-                className="btn btn-primary px-4 fw-bold"
+                className="btn btn-primary rounded-pill px-4 fw-semibold"
                 onClick={handleSubmit}
                 disabled={loading || fetchingDetails}
               >
                 {loading ? (
-                  <span><i className="fas fa-spinner fa-spin me-2"></i>Submitting...</span>
+                  <>
+                    <i className="fas fa-spinner fa-spin me-2"></i>
+                    Submitting...
+                  </>
                 ) : (
                   "Submit Review"
                 )}
               </button>
             </div>
-
           </div>
         </div>
       </div>
 
-      {/* 3. Modal Alert rendered on top if triggered */}
       {modalConfig.isOpen && (
-        <div style={{ position: "relative", zIndex: 1060 }}>
+        <div className="review-alert-layer">
           <ModalAlert
             type={modalConfig.type}
             title={modalConfig.title}

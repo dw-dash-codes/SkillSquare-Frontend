@@ -7,18 +7,20 @@ import ReviewModal from "../components/ReviewModal";
 const API_BASE_URL =
   "https://skillsquare-live-api-b9czenhchfhxdwbp.centralindia-01.azurewebsites.net";
 
-const Notifications = () => {
+const Notifications = ({ isProviderView = false }) => {
   const [notifications, setNotifications] = useState([]);
   const navigate = useNavigate();
 
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
   const [selectedBookingId, setSelectedBookingId] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
 
     const fetchNotifications = async () => {
       try {
+        setLoading(true);
         const res = await axios.get(
           `${API_BASE_URL}/api/Notification/myNotifications`,
           {
@@ -30,6 +32,8 @@ const Notifications = () => {
         setNotifications(res.data);
       } catch (err) {
         console.error("Error fetching notifications:", err);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -45,8 +49,6 @@ const Notifications = () => {
     connection
       .start()
       .then(() => {
-        console.log("SignalR connected");
-
         connection.on("ReceiveNotification", (message) => {
           const newNotif =
             typeof message === "string"
@@ -111,8 +113,7 @@ const Notifications = () => {
         }
       }
 
-      const role = localStorage.getItem("role");
-      if (role === "Provider") {
+      if (isProviderView) {
         navigate("/provider/my-bookings");
       } else {
         navigate("/my-bookings");
@@ -123,61 +124,76 @@ const Notifications = () => {
   };
 
   return (
-    <main className="notification-content">
+    <section className="app-section app-section-hero notifications-page">
       <div className="container">
-        <h1 className="notification-page-title">
-          <i className="fas fa-bell me-3"></i>Notifications
-        </h1>
+        <div className="text-center mb-5">
+          <span className="badge rounded-pill text-bg-light border px-3 py-2 mb-3">
+            Alerts & Updates
+          </span>
 
-        <div className="notifications-container mx-auto">
-          {notifications.length === 0 && (
-            <div className="text-center p-5 text-muted">
-              <i className="far fa-bell-slash fa-3x mb-3"></i>
-              <p>No notifications yet.</p>
+          <h1 className="app-section-title mb-3">
+            <i className="fas fa-bell me-3"></i>
+            {isProviderView ? "Provider Notifications" : "Notifications"}
+          </h1>
+
+          <p className="text-secondary mb-0 notifications-subtitle mx-auto">
+            Stay updated with your latest bookings, service activity, and review requests.
+          </p>
+        </div>
+
+        <div className="notifications-list-wrap mx-auto">
+          {loading ? (
+            <div className="text-center py-5">
+              <div className="spinner-border text-primary mb-3" role="status"></div>
+              <p className="mb-0 text-secondary">Loading notifications...</p>
+            </div>
+          ) : notifications.length === 0 ? (
+            <div className="card app-card border-0 text-center p-4 p-md-5 search-empty-card">
+              <div className="search-empty-icon mb-3">
+                <i className="far fa-bell-slash"></i>
+              </div>
+              <h4 className="fw-semibold mb-2">No notifications yet</h4>
+              <p className="text-secondary mb-0">
+                New alerts and booking updates will appear here.
+              </p>
+            </div>
+          ) : (
+            <div className="d-flex flex-column gap-3">
+              {notifications.map((notif) => (
+                <button
+                  key={notif.id}
+                  type="button"
+                  onClick={() => handleNotificationClick(notif)}
+                  className={`notification-item-card ${
+                    notif.isRead ? "is-read" : "is-unread"
+                  }`}
+                >
+                  <div
+                    className={`notification-item-status ${
+                      notif.isRead ? "read" : "unread"
+                    }`}
+                  ></div>
+
+                  <div className="notification-item-avatar">
+                    {notif.type === "BookingCompleted" ||
+                    (notif.message && notif.message.includes("review")) ? (
+                      <i className="fas fa-star"></i>
+                    ) : (
+                      <i className="fas fa-bell"></i>
+                    )}
+                  </div>
+
+                  <div className="notification-item-content text-start">
+                    <div className="notification-item-title">{notif.message}</div>
+                    <div className="notification-item-time">
+                      <i className="fas fa-clock me-1"></i>
+                      {new Date(notif.createdAt).toLocaleString()}
+                    </div>
+                  </div>
+                </button>
+              ))}
             </div>
           )}
-
-          {notifications.map((notif) => (
-            <div
-              key={notif.id}
-              onClick={() => {
-                if (!notif.isRead) {
-                  handleNotificationClick(notif);
-                }
-              }}
-              className="notification-card"
-              style={{
-                cursor: notif.isRead ? "default" : "pointer",
-                opacity: notif.isRead ? 0.6 : 1,
-                backgroundColor: notif.isRead ? "#f9f9f9" : "#fff",
-              }}
-            >
-              <div
-                className={`notification-status ${
-                  notif.isRead ? "read" : "unread"
-                }`}
-              ></div>
-
-              <div className="d-flex align-items-start">
-                <div className="notification-avatar">
-                  {notif.type === "BookingCompleted" ||
-                  (notif.message && notif.message.includes("review")) ? (
-                    <i className="fas fa-star notification-icon"></i>
-                  ) : (
-                    <i className="fas fa-bell notification-icon"></i>
-                  )}
-                </div>
-
-                <div className="notification-content">
-                  <div className="notification-title">{notif.message}</div>
-                  <div className="notification-time">
-                    <i className="fas fa-clock me-1"></i>
-                    {new Date(notif.createdAt).toLocaleString()}
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
         </div>
       </div>
 
@@ -186,10 +202,14 @@ const Notifications = () => {
         onClose={() => setIsReviewModalOpen(false)}
         bookingId={selectedBookingId}
         onSuccess={() => {
-          navigate("/my-bookings");
+          if (isProviderView) {
+            navigate("/provider/my-bookings");
+          } else {
+            navigate("/my-bookings");
+          }
         }}
       />
-    </main>
+    </section>
   );
 };
 

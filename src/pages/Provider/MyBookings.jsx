@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from "react";
 import api from "../../services/api";
-import ModalAlert from "../../components/ModalAlert"; // 👈 Import the ModalAlert
+import ModalAlert from "../../components/ModalAlert";
 
 const MyBookings = () => {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeFilter, setActiveFilter] = useState("All");
 
-  // 👈 Modal State Added Here
   const [modalConfig, setModalConfig] = useState({
     isOpen: false,
     type: "",
@@ -20,12 +19,10 @@ const MyBookings = () => {
     fetchBookings();
   }, []);
 
-  // Modal Close Handler
   const closeModal = () => {
-    setModalConfig({ ...modalConfig, isOpen: false });
+    setModalConfig((prev) => ({ ...prev, isOpen: false }));
   };
 
-  // 📥 Fetch Bookings from API
   const fetchBookings = async () => {
     try {
       const response = await api.get("/Booking/provider/myBookings");
@@ -37,7 +34,6 @@ const MyBookings = () => {
     }
   };
 
-  // 🔄 Update Status (Accept/Reject/Complete)
   const updateStatus = async (id, status) => {
     try {
       if (status === "Completed") {
@@ -46,12 +42,10 @@ const MyBookings = () => {
         await api.put(`/Booking/${id}/status?status=${status}`);
       }
 
-      // Update UI immediately without refresh
       setBookings((prev) =>
-        prev.map((b) => (b.id === id ? { ...b, status: status } : b))
+        prev.map((b) => (b.id === id ? { ...b, status } : b))
       );
-      
-      // 👈 Success Modal instead of alert()
+
       setModalConfig({
         isOpen: true,
         type: "success",
@@ -59,11 +53,9 @@ const MyBookings = () => {
         message: `The booking has been successfully marked as ${status}.`,
         actions: [{ label: "OK" }],
       });
-
     } catch (error) {
       console.error(`Error updating status to ${status}:`, error);
-      
-      // 👈 Error Modal instead of alert()
+
       setModalConfig({
         isOpen: true,
         type: "error",
@@ -74,13 +66,11 @@ const MyBookings = () => {
     }
   };
 
-  // 🔍 Filter Logic
   const getFilteredBookings = () => {
     if (activeFilter === "All") return bookings;
     return bookings.filter((b) => b.status === activeFilter);
   };
 
-  // 📅 Date Helper
   const formatDate = (dateString) => {
     if (!dateString) return "";
     return new Date(dateString).toLocaleDateString("en-US", {
@@ -90,27 +80,48 @@ const MyBookings = () => {
     });
   };
 
-  // 🎨 Status Badge Helper
   const getStatusBadgeClass = (status) => {
     switch (status) {
       case "Completed":
-        return "status-completed";
+        return "booking-status-completed";
       case "Pending":
-        return "status-pending";
+        return "booking-status-pending";
       case "Accepted":
-        return "badge bg-info"; // Custom class for Accepted
+        return "booking-status-confirmed";
       case "Rejected":
-        return "badge bg-danger"; // Custom class for Rejected
+        return "booking-status-cancelled";
       default:
-        return "badge bg-secondary";
+        return "booking-status-cancelled";
     }
   };
 
-  if (loading) return <div className="p-4">Loading bookings...</div>;
+  const filters = ["All", "Pending", "Accepted", "Completed", "Rejected"];
+
+  if (loading) {
+    return (
+      <>
+        {modalConfig.isOpen && (
+          <ModalAlert
+            type={modalConfig.type}
+            title={modalConfig.title}
+            message={modalConfig.message}
+            actions={modalConfig.actions}
+            onClose={closeModal}
+          />
+        )}
+
+        <section className="provider-page">
+          <div className="card app-card border-0 text-center p-4 p-md-5">
+            <div className="spinner-border text-primary mb-3" role="status"></div>
+            <p className="mb-0 text-secondary">Loading bookings...</p>
+          </div>
+        </section>
+      </>
+    );
+  }
 
   return (
     <>
-      {/* 👈 Render Modal Alert conditionally */}
       {modalConfig.isOpen && (
         <ModalAlert
           type={modalConfig.type}
@@ -121,161 +132,148 @@ const MyBookings = () => {
         />
       )}
 
-      <div className="">
-        <div className="content-header">
-          <div className="container-fluid">
-            <div className="row mb-2">
-              <div className="col-sm-6">
-                <h1 className="m-0">
-                  <i className="fas fa-calendar-check mr-2"></i>My Bookings
-                </h1>
-              </div>
+      <section className="provider-page">
+        <div className="provider-page-header mb-4">
+          <div>
+            <span className="badge rounded-pill text-bg-light border px-3 py-2 mb-2">
+              Provider Panel
+            </span>
+            <h1 className="provider-page-title mb-2">My Bookings</h1>
+            <p className="text-secondary mb-0">
+              Review, manage, and update your incoming booking requests.
+            </p>
+          </div>
+        </div>
+
+        <div className="card app-card border-0 provider-booking-filter-card mb-4">
+          <div className="card-body p-3 p-md-4">
+            <div className="d-flex flex-wrap gap-2">
+              {filters.map((status) => (
+                <button
+                  key={status}
+                  type="button"
+                  className={`provider-filter-pill ${
+                    activeFilter === status ? "active" : ""
+                  }`}
+                  onClick={() => setActiveFilter(status)}
+                >
+                  {status}
+                </button>
+              ))}
             </div>
           </div>
         </div>
 
-        <div className="content">
-          <div className="container-fluid">
-            {/* Filter Section */}
-            <div className="filter-section">
-              <div className="d-flex justify-content-between align-items-center mb-3">
-                <h5 className="mb-0">
-                  <i className="fas fa-filter mr-2"></i>Filter Bookings
-                </h5>
-              </div>
-
-              <div className="filter-tabs">
-                {["All", "Pending", "Accepted", "Completed", "Rejected"].map(
-                  (status) => (
-                    <div
-                      key={status}
-                      className={`filter-tab ${
-                        activeFilter === status ? "active" : ""
-                      }`}
-                      onClick={() => setActiveFilter(status)}
-                      style={{ cursor: "pointer" }}
-                    >
-                      <i
-                        className={`fas ${
-                          status === "All"
-                            ? "fa-list"
-                            : status === "Completed"
-                            ? "fa-check-circle"
-                            : "fa-hourglass-half"
-                        } mr-2`}
-                      ></i>
-                      {status}
-                    </div>
-                  )
-                )}
-              </div>
+        {getFilteredBookings().length === 0 ? (
+          <div className="card app-card border-0 text-center p-4 p-md-5">
+            <div className="search-empty-icon mb-3">
+              <i className="fas fa-calendar-times"></i>
             </div>
+            <h4 className="fw-semibold mb-2">No bookings found</h4>
+            <p className="text-secondary mb-0">
+              There are no bookings in this filter right now.
+            </p>
+          </div>
+        ) : (
+          <div className="d-flex flex-column gap-4">
+            {getFilteredBookings().map((booking) => (
+              <div key={booking.id} className="card app-card border-0 provider-booking-card-v2">
+                <div className="card-body p-4 p-lg-5">
+                  <div className="d-flex flex-column flex-lg-row justify-content-between align-items-lg-start gap-3 mb-4">
+                    <div>
+                      <h3 className="h5 fw-semibold mb-2">Booking #{booking.id}</h3>
+                      <p className="text-secondary mb-0">
+                        <i className="fas fa-calendar me-2"></i>
+                        {formatDate(booking.bookingDate)} at {booking.bookingTime}
+                      </p>
+                    </div>
 
-            {/* Bookings Container */}
-            <div id="provider-bookingsContainer">
-              {getFilteredBookings().length === 0 ? (
-                <p className="text-center mt-4">
-                  No bookings found in this category.
-                </p>
-              ) : (
-                getFilteredBookings().map((booking) => (
-                  <div key={booking.id} className="provider-booking-card">
-                    <div className="card-header">
-                      <div className="d-flex justify-content-between align-items-center">
-                        <div>
-                          <h5 className="mb-1">Booking #{booking.id}</h5>
-                          <small className="text-muted">
-                            <i className="fas fa-calendar mr-1"></i>
-                            {formatDate(booking.bookingDate)} at{" "}
-                            {booking.bookingTime}
-                          </small>
+                    <span className={`booking-status-badge ${getStatusBadgeClass(booking.status)}`}>
+                      {booking.status}
+                    </span>
+                  </div>
+
+                  <div className="row g-3 mb-4">
+                    <div className="col-md-4">
+                      <div className="booking-detail-card h-100">
+                        <div className="booking-detail-icon">
+                          <i className="fas fa-user"></i>
                         </div>
-                        <span
-                          className={`status-badge ${getStatusBadgeClass(
-                            booking.status
-                          )}`}
-                        >
-                          {booking.status}
-                        </span>
+                        <div>
+                          <h6 className="fw-semibold mb-1">Customer Name</h6>
+                          <p className="text-secondary mb-0">{booking.customerName}</p>
+                        </div>
                       </div>
                     </div>
 
-                    <div className="card-body">
-                      <div className="provider-booking-info-grid">
-                        <div className="info-item">
-                          <span className="info-label">Customer Name</span>
-                          <span className="info-value">
-                            <i className="fas fa-user mr-2 text-primary"></i>
-                            {booking.customerName}
-                          </span>
+                    <div className="col-md-4">
+                      <div className="booking-detail-card h-100">
+                        <div className="booking-detail-icon">
+                          <i className="fas fa-phone"></i>
                         </div>
-                        <div className="info-item">
-                          <span className="info-label">Phone Number</span>
-                          <span className="info-value">
-                            <i className="fas fa-phone mr-2 text-success"></i>
-                            {booking.customerPhone}
-                          </span>
-                        </div>
-                        <div className="info-item">
-                          <span className="info-label">Address</span>
-                          <span className="info-value">
-                            <i className="fas fa-map-marker-alt mr-2 text-danger"></i>
-                            {booking.customerAddress}
-                          </span>
+                        <div>
+                          <h6 className="fw-semibold mb-1">Phone Number</h6>
+                          <p className="text-secondary mb-0">{booking.customerPhone}</p>
                         </div>
                       </div>
+                    </div>
 
-                      <div className="info-item mb-0 mt-3">
-                        <span className="info-label">Description</span>
-                        <span className="info-value">
-                          {booking.description || "No description provided."}
-                        </span>
-                      </div>
-
-                      <div className="provider-booking-actions mt-3">
-                        {/* 1. If Pending: Show Accept & Reject */}
-                        {booking.status === "Pending" && (
-                          <>
-                            <button
-                              className="btn btn-success mr-2"
-                              onClick={() =>
-                                updateStatus(booking.id, "Accepted")
-                              }
-                            >
-                              <i className="fas fa-check mr-2"></i>Accept
-                            </button>
-                            <button
-                              className="btn btn-danger"
-                              onClick={() =>
-                                updateStatus(booking.id, "Rejected")
-                              }
-                            >
-                              <i className="fas fa-times mr-2"></i>Reject
-                            </button>
-                          </>
-                        )}
-
-                        {/* 2. If Accepted: Show Complete */}
-                        {booking.status === "Accepted" && (
-                          <button
-                            className="btn btn-primary"
-                            onClick={() =>
-                              updateStatus(booking.id, "Completed")
-                            }
-                          >
-                            <i className="fas fa-check-double mr-2"></i>Mark
-                            Completed
-                          </button>
-                        )}
+                    <div className="col-md-4">
+                      <div className="booking-detail-card h-100">
+                        <div className="booking-detail-icon">
+                          <i className="fas fa-map-marker-alt"></i>
+                        </div>
+                        <div>
+                          <h6 className="fw-semibold mb-1">Address</h6>
+                          <p className="text-secondary mb-0">{booking.customerAddress}</p>
+                        </div>
                       </div>
                     </div>
                   </div>
-                ))
-              )}
-            </div>
+
+                  <div className="booking-work-box mb-4">
+                    <h6 className="fw-semibold mb-2">Description</h6>
+                    <p className="text-secondary mb-0">
+                      {booking.description || "No description provided."}
+                    </p>
+                  </div>
+
+                  <div className="d-flex flex-wrap gap-2">
+                    {booking.status === "Pending" && (
+                      <>
+                        <button
+                          className="btn btn-success rounded-pill px-4"
+                          onClick={() => updateStatus(booking.id, "Accepted")}
+                        >
+                          <i className="fas fa-check me-2"></i>
+                          Accept
+                        </button>
+                        <button
+                          className="btn btn-outline-danger rounded-pill px-4"
+                          onClick={() => updateStatus(booking.id, "Rejected")}
+                        >
+                          <i className="fas fa-times me-2"></i>
+                          Reject
+                        </button>
+                      </>
+                    )}
+
+                    {booking.status === "Accepted" && (
+                      <button
+                        className="btn btn-primary rounded-pill px-4"
+                        onClick={() => updateStatus(booking.id, "Completed")}
+                      >
+                        <i className="fas fa-check-double me-2"></i>
+                        Mark Completed
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
-        </div>
-      </div>
+        )}
+      </section>
     </>
   );
 };

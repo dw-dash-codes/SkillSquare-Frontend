@@ -8,6 +8,7 @@ const Home = () => {
   const [featuredProviders, setFeaturedProviders] = useState([]);
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+
   useEffect(() => {
     fetchCategories();
     fetchFeaturedProviders();
@@ -28,20 +29,16 @@ const Home = () => {
       const res = await api.get("/Provider/featured");
       const providers = res.data;
 
-      // Har provider ke liye rating fetch karna
       const providersWithRatings = await Promise.all(
         providers.map(async (p) => {
           try {
             const ratingRes = await api.get(`/Review/average/${p.providerId}`);
             return {
               ...p,
-              rating: ratingRes.data.averageRating, // backend se aane wala field
+              rating: ratingRes.data.averageRating,
             };
           } catch (error) {
-            console.error(
-              `Error fetching rating for provider ${p.providerId}`,
-              error
-            );
+            console.error(`Error fetching rating for provider ${p.providerId}`, error);
             return { ...p, rating: 0 };
           }
         })
@@ -61,50 +58,62 @@ const Home = () => {
 
   const handleSearch = () => {
     if (searchTerm.trim()) {
-      // User ko Search Results page par redirect karo query k sath
       navigate(`/search-results?query=${searchTerm}`);
     }
   };
 
-  // Enter key press support
   const handleKeyPress = (e) => {
     if (e.key === "Enter") handleSearch();
   };
 
-  if (loading) return <p className="text-center mt-5">Loading...</p>;
+  if (loading) {
+    return (
+      <section className="app-section pt-5 mt-5">
+        <div className="container text-center py-5">
+          <div className="spinner-border text-primary mb-3" role="status"></div>
+          <p className="mb-0 text-secondary">Loading...</p>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <>
-      <section className="hero-section" style={{ paddingTop: "120px" }}>
+      <section className="hero-section app-section app-section-hero">
         <div className="container">
           <div className="row justify-content-center text-center">
-            <div className="col-lg-8">
-              <h1 className="hero-title">Find Local and Trusted Technicians</h1>
-              <p className="hero-subtitle">
-                Search for electricians, plumbers, house cleaners, and more.
+            <div className="col-xl-8 col-lg-10">
+              <span className="badge rounded-pill text-bg-light border mb-3 px-3 py-2">
+                Trusted Local Services
+              </span>
+
+              <h1 className="display-5 fw-bold mb-3">
+                Find Local and Trusted Technicians
+              </h1>
+
+              <p className="lead text-secondary mb-4">
+                Search for electricians, plumbers, house cleaners, and more in
+                a cleaner, faster, and more reliable way.
               </p>
 
-              <div className="search-wrap-container">
-                <div className="search-container ">
-                  <div className="input-group">
-                    {/* 👇 INPUT FIELD */}
-                    <input
-                      type="text"
-                      className="search-input"
-                      placeholder="Search for services (e.g. Plumber)..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      onKeyDown={handleKeyPress}
-                    />
-                    {/* 👇 BUTTON */}
-                    <button
-                      className="btn btn-primary search-btn"
-                      type="button"
-                      onClick={handleSearch}
-                    >
-                      <i className="fas fa-search me-2"></i>Search
-                    </button>
-                  </div>
+              <div className="app-search-card mx-auto">
+                <div className="input-group input-group-lg">
+                  <input
+                    type="text"
+                    className="form-control border-0 shadow-none"
+                    placeholder="Search for services (e.g. Plumber)..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    onKeyDown={handleKeyPress}
+                  />
+                  <button
+                    className="btn btn-primary px-4"
+                    type="button"
+                    onClick={handleSearch}
+                  >
+                    <i className="fas fa-search me-2"></i>
+                    Search
+                  </button>
                 </div>
               </div>
             </div>
@@ -112,81 +121,90 @@ const Home = () => {
         </div>
       </section>
 
-      <section className="service-categories" id="services">
+      <section className="app-section" id="services">
         <div className="container">
-          <h2 className="section-title">Service Categories</h2>
-          <div className="row">
+          <div className="text-center mb-5">
+            <h2 className="app-section-title">Service Categories</h2>
+            <p className="text-secondary mb-0">
+              Explore the most popular services available on Skill Square.
+            </p>
+          </div>
+
+          <div className="row g-4">
             {categories.slice(0, 6).map((category) => (
-              <div className="col-lg-4 col-md-6 mb-4" key={category.id}>
+              <div className="col-lg-4 col-md-6" key={category.id}>
                 <div
-                  className="category-card text-center"
-                  style={{ cursor: "pointer" }}
+                  className="card app-card category-card h-100 border-0 text-center"
+                  role="button"
                   onClick={() => handleCategoryClick(category.id)}
                 >
-                  <div className="category-icon">
-                    <i className={category.iconClass}></i>
+                  <div className="card-body p-4">
+                    <div className="app-icon-circle mx-auto mb-3">
+                      <i className={category.iconClass}></i>
+                    </div>
+                    <h5 className="fw-semibold mb-0">{category.title}</h5>
                   </div>
-                  <h3 className="category-title">{category.title}</h3>
                 </div>
               </div>
             ))}
           </div>
-        </div>
-        <div className="text-center">
-          <Link
-            to="/categories"
-            className="btn rounded-pill"
-            style={{
-              background: "linear-gradient(135deg, #ff6b6b, #ff8e8e)",
-              border: "none",
-              padding: "10px 25px",
-              fontWeight: 600,
-              borderRadius: "25px",
-              boxShadow: "0 4px 15px rgba(255, 107, 107, 0.3)",
-              color: "#fff",
-              textDecoration: "none",
-            }}
-          >
-            See More Services
-          </Link>
+
+          <div className="text-center mt-4">
+            <Link to="/categories" className="btn btn-primary rounded-pill px-4">
+              See More Services
+            </Link>
+          </div>
         </div>
       </section>
 
-      <section className="featured-section">
+      <section className="app-section app-section-muted">
         <div className="container">
-          <h2 className="section-title">Featured Technicians</h2>
-          <div className="row">
+          <div className="text-center mb-5">
+            <h2 className="app-section-title">Featured Technicians</h2>
+            <p className="text-secondary mb-0">
+              Discover top-rated professionals selected from our platform.
+            </p>
+          </div>
+
+          <div className="row g-4">
             {featuredProviders.map((provider) => (
               <div key={provider.providerId} className="col-lg-4 col-md-6">
-                <div className="technician-card text-center">
-                  <div className="technician-avatar">
-                    <i className="fas fa-user"></i>
-                  </div>
-                  <h3 className="technician-name">{provider.name}</h3>
-                  <h5>{provider.categoryName}</h5>
-                  <p className="technician-rate">${provider.hourlyRate}/hr</p>
+                <div className="card app-card h-100 border-0 text-center">
+                  <div className="card-body p-4 d-flex flex-column">
+                    <div className="app-avatar-circle mx-auto mb-3">
+                      <i className="fas fa-user"></i>
+                    </div>
 
-                  <div className="rating">
-                    {[...Array(5)].map((_, i) => (
-                      <i
-                        key={i}
-                        className={
-                          i < provider.rating
-                            ? "fas fa-star text-warning"
-                            : "far fa-star text-muted"
+                    <h5 className="fw-semibold mb-1">{provider.name}</h5>
+                    <p className="text-secondary mb-2">{provider.categoryName}</p>
+                    <h6 className="text-primary fw-bold mb-3">
+                      ${provider.hourlyRate}/hr
+                    </h6>
+
+                    <div className="mb-4">
+                      {[...Array(5)].map((_, i) => (
+                        <i
+                          key={i}
+                          className={`me-1 ${
+                            i < provider.rating
+                              ? "fas fa-star text-warning"
+                              : "far fa-star text-muted"
+                          }`}
+                        ></i>
+                      ))}
+                    </div>
+
+                    <div className="mt-auto">
+                      <button
+                        className="btn btn-outline-primary rounded-pill px-4"
+                        onClick={() =>
+                          navigate(`/providerProfile/${provider.providerId}`)
                         }
-                      ></i>
-                    ))}
+                      >
+                        View Profile
+                      </button>
+                    </div>
                   </div>
-
-                  <button
-                    className="btn btn-primary mt-2"
-                    onClick={() =>
-                      navigate(`/providerProfile/${provider.providerId}`)
-                    }
-                  >
-                    View Profile
-                  </button>
                 </div>
               </div>
             ))}

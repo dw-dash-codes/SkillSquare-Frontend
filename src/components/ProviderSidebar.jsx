@@ -1,13 +1,14 @@
-import React, { useEffect, useState } from "react"; // 👈 Import Hooks
+import React, { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 import { logoutUser } from "../services/authService";
-import axios from "axios"; // 👈 Import Axios
+import axios from "axios";
+
+const API_BASE_URL =
+  "https://skillsquare-live-api-b9czenhchfhxdwbp.centralindia-01.azurewebsites.net";
 
 const ProviderSidebar = () => {
-  // 👇 State for Badge
   const [hasUnreadNotifications, setHasUnreadNotifications] = useState(false);
 
-  // 👇 API Call Logic
   useEffect(() => {
     const checkUnreadNotifications = async () => {
       try {
@@ -15,13 +16,14 @@ const ProviderSidebar = () => {
         if (!token) return;
 
         const res = await axios.get(
-          "https://localhost:7095/api/Notification/myNotifications",
+          `${API_BASE_URL}/api/Notification/myNotifications`,
           {
-            headers: { Authorization: `Bearer ${token}` },
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
           }
         );
 
-        // Check: Unread ho AUR Deleted na ho
         const unreadExists = res.data.some((n) => !n.isRead && !n.isDeleted);
         setHasUnreadNotifications(unreadExists);
       } catch (err) {
@@ -30,120 +32,196 @@ const ProviderSidebar = () => {
     };
 
     checkUnreadNotifications();
-
-    // Optional: Har 1 minute baad refresh kare
     const interval = setInterval(checkUnreadNotifications, 60000);
     return () => clearInterval(interval);
   }, []);
 
+  const sidebarLinkClass = ({ isActive }) =>
+    `provider-sidebar-link ${isActive ? "active" : ""}`;
+
   return (
     <>
-      {/* Top Navbar */}
-      <nav className="main-header navbar navbar-expand navbar-white navbar-light">
-        <ul className="navbar-nav">
-          <li className="nav-item">
-            <a
-              className="nav-link"
-              data-widget="pushmenu"
-              href="#"
-              role="button"
+      <header className="provider-topbar d-lg-none">
+        <div className="container-fluid d-flex align-items-center justify-content-between">
+          <NavLink to="/provider" className="provider-mobile-brand text-decoration-none">
+            Skill Square
+          </NavLink>
+
+          <div className="d-flex align-items-center gap-2">
+            <NavLink
+              to="/provider/notifications"
+              className="provider-topbar-icon text-decoration-none"
+            >
+              <span className="app-notification-icon">
+                <i className="fas fa-bell"></i>
+                {hasUnreadNotifications && <span className="app-notification-dot"></span>}
+              </span>
+            </NavLink>
+
+            <button
+              className="btn provider-topbar-icon"
+              type="button"
+              data-bs-toggle="offcanvas"
+              data-bs-target="#providerSidebarDrawer"
+              aria-controls="providerSidebarDrawer"
             >
               <i className="fas fa-bars"></i>
-            </a>
-          </li>
-          <li className="nav-item d-none d-sm-inline-block">
-            <NavLink to="/provider" className="nav-link">
-              Dashboard
-            </NavLink>
-          </li>
-        </ul>
+            </button>
+          </div>
+        </div>
+      </header>
 
-        <ul className="navbar-nav ms-auto">
-          {/* 👇 NOTIFICATION ITEM WITH BADGE */}
-          <li className="nav-item">
-            <NavLink
-              to="/notifications"
-              className={({ isActive }) =>
-                "nav-link" + (isActive ? " active" : "")
-              }
-            >
-              <div style={{ position: "relative", display: "inline-block" }}>
+      <aside className="provider-sidebar d-none d-lg-flex">
+        <div className="provider-sidebar-inner">
+          <div className="provider-sidebar-brand">
+            <h5 className="mb-0 fw-bold">Skill Square</h5>
+            <p className="mb-0 text-secondary small">Provider Panel</p>
+          </div>
+
+          <nav className="provider-sidebar-nav">
+            <NavLink to="/provider" end className={sidebarLinkClass}>
+              <i className="fas fa-th-large"></i>
+              <span>Dashboard</span>
+            </NavLink>
+
+            <NavLink to="/provider/profile" className={sidebarLinkClass}>
+              <i className="fas fa-user"></i>
+              <span>My Profile</span>
+            </NavLink>
+
+            <NavLink to="/provider/my-bookings" className={sidebarLinkClass}>
+              <i className="fas fa-calendar-alt"></i>
+              <span>Bookings</span>
+            </NavLink>
+
+            <NavLink to="/provider/my-reviews" className={sidebarLinkClass}>
+              <i className="fas fa-star"></i>
+              <span>Reviews</span>
+            </NavLink>
+
+            <NavLink to="/provider/notifications" className={sidebarLinkClass}>
+              <span className="provider-link-icon-wrap">
                 <i className="fas fa-bell"></i>
-
-                {/* 👇 Red Dot Logic */}
-                {hasUnreadNotifications && (
-                  <span
-                    style={{
-                      position: "absolute",
-                      top: "-2px", // Thora adjust kia ta k icon k upar fit aye
-                      right: "-2px",
-                      height: "8px",
-                      width: "8px",
-                      backgroundColor: "red",
-                      borderRadius: "50%",
-                      display: "block",
-                    }}
-                  ></span>
-                )}
-              </div>
+                {hasUnreadNotifications && <span className="provider-sidebar-dot"></span>}
+              </span>
+              <span>Notifications</span>
             </NavLink>
-          </li>
+          </nav>
 
-          <li className="nav-item">
-            <NavLink to="/provider/profile" className="nav-link">
-              <i className="far fa-user"></i> Profile
+          <div className="provider-sidebar-bottom">
+            <NavLink to="/" className="provider-sidebar-secondary text-decoration-none">
+              <i className="fas fa-globe me-2"></i>
+              View Site
             </NavLink>
-          </li>
-          <li className="nav-item">
+
             <NavLink
-              onClick={logoutUser}
               to="/login"
-              className="nav-link text-danger"
+              onClick={logoutUser}
+              className="provider-sidebar-logout text-decoration-none"
             >
+              <i className="fas fa-sign-out-alt me-2"></i>
               Logout
             </NavLink>
-          </li>
-        </ul>
-      </nav>
-
-      {/* Sidebar */}
-      <aside className="main-sidebar sidebar-dark-primary elevation-4">
-        <NavLink to="/provider" className="brand-link">
-          <span className="brand-text ms-2">Skill Square</span>
-        </NavLink>
-
-        <div className="sidebar">
-          <nav className="mt-2">
-            <ul className="nav nav-pills nav-sidebar flex-column" role="menu">
-              <li className="nav-item">
-                <NavLink to="/provider" end className="nav-link">
-                  <i className="nav-icon fas fa-tachometer-alt"></i>
-                  <p>Dashboard</p>
-                </NavLink>
-              </li>
-              <li className="nav-item">
-                <NavLink to="/provider/profile" className="nav-link">
-                  <i className="nav-icon fas fa-user-cog"></i>
-                  <p>My Profile</p>
-                </NavLink>
-              </li>
-              <li className="nav-item">
-                <NavLink to="/provider/my-bookings" className="nav-link">
-                  <i className="nav-icon fas fa-calendar-check"></i>
-                  <p>Bookings</p>
-                </NavLink>
-              </li>
-
-              <li className="nav-item">
-                <NavLink to="/provider/my-reviews" className="nav-link">
-                  <i className="nav-icon fas fa-star"></i>
-                  <p>Reviews</p>
-                </NavLink>
-              </li>
-            </ul>
-          </nav>
+          </div>
         </div>
       </aside>
+
+      <div
+        className="offcanvas offcanvas-start provider-mobile-drawer"
+        tabIndex="-1"
+        id="providerSidebarDrawer"
+        aria-labelledby="providerSidebarDrawerLabel"
+      >
+        <div className="offcanvas-header">
+          <div>
+            <h5 className="mb-0 fw-bold" id="providerSidebarDrawerLabel">
+              Skill Square
+            </h5>
+            <p className="mb-0 text-secondary small">Provider Panel</p>
+          </div>
+
+          <button
+            type="button"
+            className="btn-close"
+            data-bs-dismiss="offcanvas"
+            aria-label="Close"
+          ></button>
+        </div>
+
+        <div className="offcanvas-body d-flex flex-column">
+          <nav className="provider-sidebar-nav">
+            <NavLink
+              to="/provider"
+              end
+              className={sidebarLinkClass}
+              data-bs-dismiss="offcanvas"
+            >
+              <i className="fas fa-th-large"></i>
+              <span>Dashboard</span>
+            </NavLink>
+
+            <NavLink
+              to="/provider/profile"
+              className={sidebarLinkClass}
+              data-bs-dismiss="offcanvas"
+            >
+              <i className="fas fa-user"></i>
+              <span>My Profile</span>
+            </NavLink>
+
+            <NavLink
+              to="/provider/my-bookings"
+              className={sidebarLinkClass}
+              data-bs-dismiss="offcanvas"
+            >
+              <i className="fas fa-calendar-alt"></i>
+              <span>Bookings</span>
+            </NavLink>
+
+            <NavLink
+              to="/provider/my-reviews"
+              className={sidebarLinkClass}
+              data-bs-dismiss="offcanvas"
+            >
+              <i className="fas fa-star"></i>
+              <span>Reviews</span>
+            </NavLink>
+
+            <NavLink
+              to="/provider/notifications"
+              className={sidebarLinkClass}
+              data-bs-dismiss="offcanvas"
+            >
+              <span className="provider-link-icon-wrap">
+                <i className="fas fa-bell"></i>
+                {hasUnreadNotifications && <span className="provider-sidebar-dot"></span>}
+              </span>
+              <span>Notifications</span>
+            </NavLink>
+          </nav>
+
+          <div className="provider-sidebar-bottom mt-auto">
+            <NavLink
+              to="/"
+              className="provider-sidebar-secondary text-decoration-none"
+              data-bs-dismiss="offcanvas"
+            >
+              <i className="fas fa-globe me-2"></i>
+              View Site
+            </NavLink>
+
+            <NavLink
+              to="/login"
+              onClick={logoutUser}
+              className="provider-sidebar-logout text-decoration-none"
+              data-bs-dismiss="offcanvas"
+            >
+              <i className="fas fa-sign-out-alt me-2"></i>
+              Logout
+            </NavLink>
+          </div>
+        </div>
+      </div>
     </>
   );
 };

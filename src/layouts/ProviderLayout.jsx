@@ -5,20 +5,16 @@ import ProviderFooter from "../components/ProviderFooter";
 
 const ProviderLayout = () => {
   return (
-    <>
-      <div className="hold-transition sidebar-mini layout-fixed">
-        <div className="wrapper">
-          <ProviderSidebar />
+    <div className="provider-layout">
+      <ProviderSidebar />
 
-          <div className="content-wrapper">
-            <Outlet />
-          </div>
-
-          {/* Footer */}
-          <ProviderFooter />
-        </div>
+      <div className="provider-main">
+        <main className="provider-content">
+          <Outlet />
+        </main>
+        <ProviderFooter />
       </div>
-    </>
+    </div>
   );
 };
 

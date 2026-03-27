@@ -105,6 +105,7 @@ const App = () => {
             <Route path="my-bookings" element={<MyBookings />} />
             <Route path="profile" element={<Profile />} />
             <Route path="my-reviews" element={<MyReviews />} />
+            <Route path="notifications" element={<Notifications isProviderView={true} />} />
           </Route>
         </Route>
 

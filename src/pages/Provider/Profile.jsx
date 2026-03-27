@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
-import api from "../../services/api"; // Make sure path is correct
+import api from "../../services/api";
 import { jwtDecode } from "jwt-decode";
-import ModalAlert from "../../components/ModalAlert"; // 👈 Import the ModalAlert
+import ModalAlert from "../../components/ModalAlert";
 
 const Profile = () => {
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [categories, setCategories] = useState([]);
-  // 1️⃣ ID store karne ke liye state add ki
   const [userId, setUserId] = useState(null);
 
   const [form, setForm] = useState({
@@ -16,13 +16,13 @@ const Profile = () => {
     phoneNumber: "",
     city: "",
     address: "",
+    area: "",
     categoryId: "",
     skills: "",
     bio: "",
     hourlyRate: "",
   });
 
-  // 👈 Modal State Added Here
   const [modalConfig, setModalConfig] = useState({
     isOpen: false,
     type: "",
@@ -36,9 +36,8 @@ const Profile = () => {
     loadCategories();
   }, []);
 
-  // Modal Close Handler
   const closeModal = () => {
-    setModalConfig({ ...modalConfig, isOpen: false });
+    setModalConfig((prev) => ({ ...prev, isOpen: false }));
   };
 
   const loadProfile = async () => {
@@ -47,29 +46,21 @@ const Profile = () => {
       if (!token) return;
 
       const decoded = jwtDecode(token);
-
-      // Token se ID extract ki
       const id =
         decoded[
           "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"
         ];
 
-      // 2️⃣ ID ko state me set kiya taake submit k waqt use kar sakein
       setUserId(id);
 
-      // 👤 Basic profile fetch
       const userRes = await api.get("/User/profile");
 
-      // 🧑‍🔧 Provider profile fetch
-      // Note: Backend might return 404 if provider doesn't exist yet, handle gracefully if needed
       let providerData = {};
       try {
         const providerRes = await api.get(`/Provider/${id}`);
         providerData = providerRes.data;
       } catch (error) {
-        console.log(
-          "User is not a provider yet or error fetching provider details."
-        );
+        console.log("User is not a provider yet or error fetching provider details.");
       }
 
       setForm({
@@ -79,7 +70,7 @@ const Profile = () => {
         phoneNumber: userRes.data.phoneNumber || "",
         city: userRes.data.city || "",
         address: userRes.data.address || "",
-        // Provider data (handle nulls safely)
+        area: providerData.area || "",
         categoryId: providerData.categoryId || "",
         skills: providerData.skills || "",
         bio: providerData.bio || "",
@@ -109,7 +100,6 @@ const Profile = () => {
     e.preventDefault();
 
     if (!userId) {
-      // 👈 Error Modal for missing ID
       setModalConfig({
         isOpen: true,
         type: "error",
@@ -121,7 +111,8 @@ const Profile = () => {
     }
 
     try {
-      // 1️⃣ Update USER profile
+      setSaving(true);
+
       await api.put("/User/profile", {
         firstName: form.firstName,
         lastName: form.lastName,
@@ -130,16 +121,14 @@ const Profile = () => {
         address: form.address,
       });
 
-      // 2️⃣ Update PROVIDER profile (FIXED URL)
-      // Ab hum URL me userId pass kar rahe hain
       await api.put(`/Provider/UpdateProfile/${userId}`, {
-        firstName: form.firstName, // Backend model validation ke liye ye fields bhejni par sakti hain
+        firstName: form.firstName,
         lastName: form.lastName,
         phoneNumber: form.phoneNumber,
         address: form.address,
-        area: form.area || "", // Added default empty string if area is missing
+        area: form.area || "",
         city: form.city,
-        categoryId: Number(form.categoryId), // Ensure number
+        categoryId: Number(form.categoryId),
         skills: form.skills,
         bio: form.bio,
         hourlyRate: Number(form.hourlyRate),
@@ -147,7 +136,6 @@ const Profile = () => {
         password: "DummyPassword123!",
       });
 
-      // 👈 Success Modal
       setModalConfig({
         isOpen: true,
         type: "success",
@@ -157,8 +145,7 @@ const Profile = () => {
       });
     } catch (err) {
       console.error("Update failed:", err.response?.data || err);
-      
-      // 👈 Error Modal for Update Failure
+
       setModalConfig({
         isOpen: true,
         type: "error",
@@ -168,14 +155,24 @@ const Profile = () => {
         )}`,
         actions: [{ label: "Close" }],
       });
+    } finally {
+      setSaving(false);
     }
   };
 
-  if (loading) return <p className="p-4">Loading profile...</p>;
+  if (loading) {
+    return (
+      <section className="provider-page">
+        <div className="card app-card border-0 text-center p-4 p-md-5">
+          <div className="spinner-border text-primary mb-3" role="status"></div>
+          <p className="mb-0 text-secondary">Loading profile...</p>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <>
-      {/* 👈 Render Modal Alert conditionally */}
       {modalConfig.isOpen && (
         <ModalAlert
           type={modalConfig.type}
@@ -186,141 +183,166 @@ const Profile = () => {
         />
       )}
 
-      <div>
-        <div className="content-header">
-          <div className="container-fluid">
-            <h1 className="m-0">My Profile</h1>
+      <section className="provider-page">
+        <div className="provider-page-header mb-4">
+          <div>
+            <span className="badge rounded-pill text-bg-light border px-3 py-2 mb-2">
+              Provider Panel
+            </span>
+            <h1 className="provider-page-title mb-2">My Profile</h1>
+            <p className="text-secondary mb-0">
+              Update your personal details and service information.
+            </p>
           </div>
         </div>
 
-        <div className="content">
-          <div className="container-fluid">
-            <div className="row">
-              <div className="col-lg-8">
-                <div className="card">
-                  <div className="card-body">
-                    <form onSubmit={handleSubmit}>
-                      <div className="row">
-                        <div className="col-md-6 mb-3">
-                          <label>First Name</label>
-                          <input
-                            name="firstName"
-                            className="form-control"
-                            value={form.firstName}
-                            onChange={handleChange}
-                          />
-                        </div>
+        <div className="card app-card border-0 provider-profile-card">
+          <div className="card-body p-4 p-lg-5">
+            <form onSubmit={handleSubmit}>
+              <div className="row g-3">
+                <div className="col-md-6">
+                  <label className="form-label auth-label">First Name</label>
+                  <input
+                    name="firstName"
+                    className="form-control auth-input"
+                    value={form.firstName}
+                    onChange={handleChange}
+                  />
+                </div>
 
-                        <div className="col-md-6 mb-3">
-                          <label>Last Name</label>
-                          <input
-                            name="lastName"
-                            className="form-control"
-                            value={form.lastName}
-                            onChange={handleChange}
-                          />
-                        </div>
-                      </div>
+                <div className="col-md-6">
+                  <label className="form-label auth-label">Last Name</label>
+                  <input
+                    name="lastName"
+                    className="form-control auth-input"
+                    value={form.lastName}
+                    onChange={handleChange}
+                  />
+                </div>
 
-                      <div className="mb-3">
-                        <label>Email</label>
-                        <input
-                          className="form-control"
-                          value={form.email}
-                          disabled
-                        />
-                      </div>
+                <div className="col-md-6">
+                  <label className="form-label auth-label">Email</label>
+                  <input
+                    className="form-control auth-input bg-light"
+                    value={form.email}
+                    disabled
+                  />
+                </div>
 
-                      <div className="row">
-                        <div className="col-md-6 mb-3">
-                          <label>Phone</label>
-                          <input
-                            name="phoneNumber"
-                            className="form-control"
-                            value={form.phoneNumber}
-                            onChange={handleChange}
-                          />
-                        </div>
+                <div className="col-md-6">
+                  <label className="form-label auth-label">Phone</label>
+                  <input
+                    name="phoneNumber"
+                    className="form-control auth-input"
+                    value={form.phoneNumber}
+                    onChange={handleChange}
+                  />
+                </div>
 
-                        <div className="col-md-6 mb-3">
-                          <label>City</label>
-                          <input
-                            name="city"
-                            className="form-control"
-                            value={form.city}
-                            onChange={handleChange}
-                          />
-                        </div>
-                      </div>
+                <div className="col-md-4">
+                  <label className="form-label auth-label">City</label>
+                  <input
+                    name="city"
+                    className="form-control auth-input"
+                    value={form.city}
+                    onChange={handleChange}
+                  />
+                </div>
 
-                      <div className="mb-3">
-                        <label>Address</label>
-                        <input
-                          name="address"
-                          className="form-control"
-                          value={form.address}
-                          onChange={handleChange}
-                        />
-                      </div>
+                <div className="col-md-4">
+                  <label className="form-label auth-label">Area</label>
+                  <input
+                    name="area"
+                    className="form-control auth-input"
+                    value={form.area}
+                    onChange={handleChange}
+                  />
+                </div>
 
-                      <div className="mb-3">
-                        <label>Service Category</label>
-                        <select
-                          name="categoryId"
-                          className="form-select"
-                          value={form.categoryId}
-                          onChange={handleChange}
-                        >
-                          <option value="">Select category</option>
-                          {categories.map((c) => (
-                            <option key={c.id} value={c.id}>
-                              {c.title}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
+                <div className="col-md-4">
+                  <label className="form-label auth-label">Hourly Rate</label>
+                  <input
+                    type="number"
+                    name="hourlyRate"
+                    className="form-control auth-input"
+                    value={form.hourlyRate}
+                    onChange={handleChange}
+                  />
+                </div>
 
-                      <div className="mb-3">
-                        <label>Skills</label>
-                        <input
-                          name="skills"
-                          className="form-control"
-                          value={form.skills}
-                          onChange={handleChange}
-                        />
-                      </div>
+                <div className="col-12">
+                  <label className="form-label auth-label">Address</label>
+                  <input
+                    name="address"
+                    className="form-control auth-input"
+                    value={form.address}
+                    onChange={handleChange}
+                  />
+                </div>
 
-                      <div className="mb-3">
-                        <label>Bio</label>
-                        <textarea
-                          name="bio"
-                          className="form-control"
-                          rows="4"
-                          value={form.bio}
-                          onChange={handleChange}
-                        />
-                      </div>
+                <div className="col-md-6">
+                  <label className="form-label auth-label">Service Category</label>
+                  <select
+                    name="categoryId"
+                    className="form-select auth-input"
+                    value={form.categoryId}
+                    onChange={handleChange}
+                  >
+                    <option value="">Select category</option>
+                    {categories.map((c) => (
+                      <option key={c.id} value={c.id}>
+                        {c.title}
+                      </option>
+                    ))}
+                  </select>
+                </div>
 
-                      <div className="mb-3">
-                        <label>Hourly Rate</label>
-                        <input
-                          type="number"
-                          name="hourlyRate"
-                          className="form-control"
-                          value={form.hourlyRate}
-                          onChange={handleChange}
-                        />
-                      </div>
+                <div className="col-md-6">
+                  <label className="form-label auth-label">Skills</label>
+                  <input
+                    name="skills"
+                    className="form-control auth-input"
+                    value={form.skills}
+                    onChange={handleChange}
+                    placeholder="e.g. plumbing, pipe fitting, installation"
+                  />
+                </div>
 
-                      <button className="btn btn-primary">Save Profile</button>
-                    </form>
-                  </div>
+                <div className="col-12">
+                  <label className="form-label auth-label">Bio</label>
+                  <textarea
+                    name="bio"
+                    className="form-control auth-input auth-textarea"
+                    rows="5"
+                    value={form.bio}
+                    onChange={handleChange}
+                    placeholder="Write a short description about your services and experience"
+                  />
                 </div>
               </div>
-            </div>
+
+              <div className="d-flex flex-column flex-sm-row gap-3 mt-4">
+                <button
+                  className="btn btn-primary rounded-pill px-4 py-3 fw-semibold"
+                  disabled={saving}
+                >
+                  {saving ? (
+                    <>
+                      <i className="fas fa-spinner fa-spin me-2"></i>
+                      Saving...
+                    </>
+                  ) : (
+                    <>
+                      <i className="fas fa-save me-2"></i>
+                      Save Profile
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
-      </div>
+      </section>
     </>
   );
 };

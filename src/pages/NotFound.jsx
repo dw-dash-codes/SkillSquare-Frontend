@@ -3,62 +3,43 @@ import { Link } from "react-router-dom";
 
 const NotFound = () => {
   return (
-    <div style={styles.container}>
-      <div style={styles.content}>
-        <h1 style={styles.errorCode}>404</h1>
-        <h2 style={styles.heading}>Oops! Page Not Found</h2>
-        <p style={styles.text}>
-          The page you are looking for might have been removed, had its name
-          changed, or is temporarily unavailable.
-        </p>
-        <Link to="/" className="btn btn-primary" style={styles.button}>
-          <i className="fas fa-home mr-2"></i> Go to Homepage
-        </Link>
-      </div>
-    </div>
-  );
-};
+    <section className="app-section app-section-hero not-found-page min-vh-100 d-flex align-items-center">
+      <div className="container">
+        <div className="card app-card border-0 text-center not-found-card mx-auto">
+          <div className="card-body p-4 p-md-5">
+            <div className="not-found-icon mb-4">
+              <i className="fas fa-compass"></i>
+            </div>
 
-// Simple internal styling taake aapko alag CSS file na banani pare
-const styles = {
-  container: {
-    height: "100vh",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#f4f6f9",
-    textAlign: "center",
-  },
-  content: {
-    maxWidth: "500px",
-    padding: "40px",
-    backgroundColor: "white",
-    borderRadius: "8px",
-    boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
-  },
-  errorCode: {
-    fontSize: "80px",
-    fontWeight: "bold",
-    color: "#dc3545", // Red color like danger
-    margin: "0",
-  },
-  heading: {
-    fontSize: "24px",
-    marginTop: "10px",
-    marginBottom: "20px",
-    color: "#333",
-  },
-  text: {
-    color: "#666",
-    marginBottom: "30px",
-    fontSize: "16px",
-    lineHeight: "1.5",
-  },
-  button: {
-    padding: "10px 20px",
-    fontSize: "16px",
-    borderRadius: "50px", // Rounded pill button
-  },
+            <span className="badge rounded-pill text-bg-light border px-3 py-2 mb-3">
+              Error 404
+            </span>
+
+            <h1 className="display-6 fw-bold mb-3">Page not found</h1>
+
+            <p className="text-secondary mb-4">
+              The page you’re looking for doesn’t exist or may have been moved.
+            </p>
+
+            <div className="d-flex flex-column flex-sm-row justify-content-center gap-3">
+              <Link to="/" className="btn btn-primary rounded-pill px-4 py-3 fw-semibold">
+                <i className="fas fa-home me-2"></i>
+                Go Home
+              </Link>
+
+              <Link
+                to="/categories"
+                className="btn btn-outline-secondary rounded-pill px-4 py-3 fw-semibold"
+              >
+                <i className="fas fa-th-large me-2"></i>
+                Browse Services
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
 };
 
 export default NotFound;
