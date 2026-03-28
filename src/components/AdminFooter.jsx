@@ -2,14 +2,16 @@ import React from "react";
 
 const AdminFooter = () => {
   return (
-    <>
-      <footer className="main-footer">
-        <div className="float-right d-none d-sm-inline">
-          <strong>Admin Panel</strong>
+    <footer className="admin-footer">
+      <div className="container-fluid">
+        <div className="admin-footer-inner">
+          <p className="mb-0">
+            <strong>© 2025 Skill Square.</strong> All rights reserved.
+          </p>
+          <p className="mb-0">Admin Panel</p>
         </div>
-        <strong>&copy; 2025 Skill Square.</strong> All rights reserved.
-      </footer>
-    </>
+      </div>
+    </footer>
   );
 };
 

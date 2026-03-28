@@ -1,26 +1,41 @@
 import React, { useEffect, useState } from "react";
-import { 
-  getAllCategories, 
-  deleteCategory, 
-  createCategory, 
-  updateCategory 
-} from "../../services/api"; 
+import {
+  getAllCategories,
+  deleteCategory,
+  createCategory,
+  updateCategory,
+} from "../../services/api";
+import ModalAlert from "../../components/ModalAlert";
 
 const GetAllCategories = () => {
-  // State
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
-  
-  // Modal State
+
   const [showModal, setShowModal] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [saving, setSaving] = useState(false);
+
   const [formData, setFormData] = useState({
     id: 0,
     title: "",
-    iconClass: ""
+    iconClass: "",
   });
 
-  // 1. Fetch Data
+  const [confirmConfig, setConfirmConfig] = useState({
+    isOpen: false,
+    title: "",
+    message: "",
+    onConfirm: null,
+  });
+
+  const [modalConfig, setModalConfig] = useState({
+    isOpen: false,
+    type: "",
+    title: "",
+    message: "",
+    actions: [],
+  });
+
   useEffect(() => {
     fetchCategories();
   }, []);
@@ -36,162 +51,372 @@ const GetAllCategories = () => {
     }
   };
 
-  // 2. Handle Inputs
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+  const closeModalAlert = () => {
+    setModalConfig((prev) => ({ ...prev, isOpen: false }));
   };
 
-  // 3. Open Modals
+  const closeConfirm = () => {
+    setConfirmConfig({
+      isOpen: false,
+      title: "",
+      message: "",
+      onConfirm: null,
+    });
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
   const openAddModal = () => {
     setIsEditing(false);
-    setFormData({ id: 0, title: "", iconClass: "" }); 
+    setFormData({ id: 0, title: "", iconClass: "" });
     setShowModal(true);
   };
 
   const openEditModal = (category) => {
     setIsEditing(true);
-    setFormData({ 
-      id: category.id, 
-      title: category.title, 
-      iconClass: category.iconClass || "" 
+    setFormData({
+      id: category.id,
+      title: category.title,
+      iconClass: category.iconClass || "",
     });
     setShowModal(true);
   };
 
-  // 4. Submit Form (The Critical Part)
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    if (!formData.title) {
-      alert("Category Title is required!");
+
+    if (!formData.title.trim()) {
+      setModalConfig({
+        isOpen: true,
+        type: "error",
+        title: "Validation Error",
+        message: "Category title is required.",
+        actions: [{ label: "OK" }],
+      });
       return;
     }
 
-    // Prepare Payload (Matches Backend DTO)
     const payload = {
-        title: formData.title,
-        iconClass: formData.iconClass
+      title: formData.title,
+      iconClass: formData.iconClass,
     };
 
     try {
+      setSaving(true);
+
       if (isEditing) {
-        // UPDATE
         await updateCategory(formData.id, payload);
-        alert("Category updated successfully!");
+        setModalConfig({
+          isOpen: true,
+          type: "success",
+          title: "Category Updated",
+          message: "Category updated successfully.",
+          actions: [{ label: "OK" }],
+        });
       } else {
-        // CREATE
         await createCategory(payload);
-        alert("Category added successfully!");
+        setModalConfig({
+          isOpen: true,
+          type: "success",
+          title: "Category Added",
+          message: "Category added successfully.",
+          actions: [{ label: "OK" }],
+        });
       }
-      
-      // Refresh list & Close modal
+
       await fetchCategories();
       setShowModal(false);
-
     } catch (err) {
       console.error("Operation failed:", err);
-      alert("Operation failed. Check console for details.");
+      setModalConfig({
+        isOpen: true,
+        type: "error",
+        title: "Operation Failed",
+        message: "Operation failed. Please check the data and try again.",
+        actions: [{ label: "Close" }],
+      });
+    } finally {
+      setSaving(false);
     }
   };
 
-  // 5. Delete
-  const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure?")) return;
-    try {
-      await deleteCategory(id);
-      setCategories(categories.filter((cat) => cat.id !== id));
-    } catch (err) {
-      alert("Error deleting category.");
-    }
+  const handleDelete = (id) => {
+    setConfirmConfig({
+      isOpen: true,
+      title: "Delete Category?",
+      message: "Are you sure you want to delete this category?",
+      onConfirm: async () => {
+        try {
+          await deleteCategory(id);
+          setCategories((prev) => prev.filter((cat) => cat.id !== id));
+
+          setModalConfig({
+            isOpen: true,
+            type: "success",
+            title: "Category Deleted",
+            message: "The category has been removed successfully.",
+            actions: [{ label: "OK" }],
+          });
+        } catch (err) {
+          setModalConfig({
+            isOpen: true,
+            type: "error",
+            title: "Delete Failed",
+            message: "Error deleting category.",
+            actions: [{ label: "Close" }],
+          });
+        }
+      },
+    });
   };
 
-  if (loading) return <div className="p-4">Loading...</div>;
+  if (loading) {
+    return (
+      <>
+        {modalConfig.isOpen && (
+          <ModalAlert
+            type={modalConfig.type}
+            title={modalConfig.title}
+            message={modalConfig.message}
+            actions={modalConfig.actions}
+            onClose={closeModalAlert}
+          />
+        )}
+
+        <section className="admin-page">
+          <div className="card app-card border-0 text-center p-4 p-md-5">
+            <div className="spinner-border text-primary mb-3" role="status"></div>
+            <p className="mb-0 text-secondary">Loading categories...</p>
+          </div>
+        </section>
+      </>
+    );
+  }
 
   return (
     <>
-      <div className="">
-        <div className="content-header">
-          <div className="container-fluid">
-            <h1 className="m-0">Manage Categories</h1>
+      {modalConfig.isOpen && (
+        <ModalAlert
+          type={modalConfig.type}
+          title={modalConfig.title}
+          message={modalConfig.message}
+          actions={modalConfig.actions}
+          onClose={closeModalAlert}
+        />
+      )}
+
+      {confirmConfig.isOpen && (
+        <ModalAlert
+          type="info"
+          title={confirmConfig.title}
+          message={confirmConfig.message}
+          actions={[
+            {
+              label: "Proceed",
+              onClick: async () => {
+                await confirmConfig.onConfirm?.();
+                closeConfirm();
+              },
+            },
+            {
+              label: "Cancel",
+              onClick: closeConfirm,
+            },
+          ]}
+          onClose={closeConfirm}
+        />
+      )}
+
+      <section className="admin-page">
+        <div className="admin-page-header mb-4">
+          <div>
+            <span className="badge rounded-pill text-bg-light border px-3 py-2 mb-2">
+              Admin Panel
+            </span>
+            <h1 className="admin-page-title mb-2">Manage Categories</h1>
+            <p className="text-secondary mb-0">
+              Add, edit, and organize service categories across the platform.
+            </p>
+          </div>
+
+          <div>
+            <button
+              className="btn btn-primary rounded-pill px-4"
+              onClick={openAddModal}
+            >
+              <i className="fas fa-plus me-2"></i>
+              Add Category
+            </button>
           </div>
         </div>
 
-        <div className="content">
-          <div className="container-fluid">
-            <div className="card">
-              <div className="card-header d-flex justify-content-between align-items-center">
-                <h3 className="card-title mb-0">Category List</h3>
-                <button className="btn btn-primary btn-sm ms-auto" onClick={openAddModal}>
-                  <i className="fas fa-plus me-2"></i> Add Category
-                </button>
-              </div>
+        <div className="card app-card border-0 admin-table-card">
+          <div className="card-body p-0">
+            <div className="p-4 pb-3 border-bottom">
+              <h2 className="h5 fw-semibold mb-1">Category List</h2>
+              <p className="text-secondary mb-0">
+                All available service categories and their assigned icons.
+              </p>
+            </div>
 
-              <div className="card-body p-0">
-                <table className="table table-striped mb-0">
-                  <thead className="bg-light">
+            {categories.length === 0 ? (
+              <div className="text-center p-4 p-md-5">
+                <div className="search-empty-icon mb-3">
+                  <i className="fas fa-th-list"></i>
+                </div>
+                <h5 className="fw-semibold mb-2">No categories found</h5>
+                <p className="text-secondary mb-0">
+                  Categories will appear here once created.
+                </p>
+              </div>
+            ) : (
+              <div className="table-responsive">
+                <table className="table align-middle mb-0 admin-data-table">
+                  <thead>
                     <tr>
-                      <th style={{ width: "50px" }}>ID</th>
+                      <th>ID</th>
                       <th>Category Name</th>
                       <th>Icon Class</th>
                       <th>Preview</th>
-                      <th style={{ width: "150px" }}>Actions</th>
+                      <th className="text-end">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {categories.length === 0 ? (
-                      <tr><td colSpan="5" className="text-center p-3">No categories found.</td></tr>
-                    ) : (
-                      categories.map((cat) => (
-                        <tr key={cat.id}>
-                          <td>{cat.id}</td>
-                          <td><strong>{cat.title}</strong></td>
-                          <td><code>{cat.iconClass}</code></td>
-                          <td className="text-center"><i className={`${cat.iconClass} fa-lg`}></i></td>
-                          <td>
-                            <button className="btn btn-sm btn-info me-2 text-white" onClick={() => openEditModal(cat)}>
-                              <i className="fas fa-edit"></i>
+                    {categories.map((cat) => (
+                      <tr key={cat.id}>
+                        <td className="fw-semibold">#{cat.id}</td>
+                        <td>
+                          <strong>{cat.title}</strong>
+                        </td>
+                        <td>
+                          <code>{cat.iconClass || "N/A"}</code>
+                        </td>
+                        <td>
+                          <div className="admin-category-preview">
+                            <i className={`${cat.iconClass} fa-lg`}></i>
+                          </div>
+                        </td>
+                        <td className="text-end">
+                          <div className="d-flex justify-content-end gap-2 flex-wrap">
+                            <button
+                              className="btn btn-sm btn-outline-primary rounded-pill px-3"
+                              onClick={() => openEditModal(cat)}
+                            >
+                              <i className="fas fa-edit me-1"></i>
+                              Edit
                             </button>
-                            <button className="btn btn-sm btn-danger" onClick={() => handleDelete(cat.id)}>
-                              <i className="fas fa-trash"></i>
+
+                            <button
+                              className="btn btn-sm btn-outline-danger rounded-pill px-3"
+                              onClick={() => handleDelete(cat.id)}
+                            >
+                              <i className="fas fa-trash me-1"></i>
+                              Delete
                             </button>
-                          </td>
-                        </tr>
-                      ))
-                    )}
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
                   </tbody>
                 </table>
               </div>
-            </div>
+            )}
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* Modal */}
       {showModal && (
         <>
-          <div className="modal-backdrop fade show"></div>
-          <div className="modal fade show d-block" tabIndex="-1">
-            <div className="modal-dialog">
-              <div className="modal-content">
-                <div className="modal-header bg-primary text-white">
-                  <h5 className="modal-title">{isEditing ? "Edit Category" : "Add New Category"}</h5>
-                  <button type="button" className="btn-close btn-close-white" onClick={() => setShowModal(false)}></button>
+          <div className="modal-alert-backdrop" onClick={() => setShowModal(false)}></div>
+
+          <div
+            className="modal d-block review-modal-wrapper"
+            tabIndex="-1"
+            role="dialog"
+            aria-modal="true"
+          >
+            <div className="modal-dialog modal-dialog-centered">
+              <div className="modal-content border-0 review-modal-card">
+                <div className="modal-header review-modal-header border-0">
+                  <h5 className="modal-title fw-bold">
+                    <i className="fas fa-th-list me-2"></i>
+                    {isEditing ? "Edit Category" : "Add New Category"}
+                  </h5>
+                  <button
+                    type="button"
+                    className="btn-close btn-close-white"
+                    onClick={() => setShowModal(false)}
+                  ></button>
                 </div>
+
                 <form onSubmit={handleSubmit}>
-                  <div className="modal-body">
+                  <div className="modal-body p-4">
                     <div className="mb-3">
-                      <label className="form-label">Category Title</label>
-                      <input type="text" className="form-control" name="title" value={formData.title} onChange={handleInputChange} required />
+                      <label className="form-label auth-label">Category Title</label>
+                      <input
+                        type="text"
+                        className="form-control auth-input"
+                        name="title"
+                        value={formData.title}
+                        onChange={handleInputChange}
+                        required
+                      />
                     </div>
+
                     <div className="mb-3">
-                      <label className="form-label">Icon Class (FontAwesome)</label>
-                      <input type="text" className="form-control" name="iconClass" value={formData.iconClass} onChange={handleInputChange} />
+                      <label className="form-label auth-label">
+                        Icon Class (FontAwesome)
+                      </label>
+                      <input
+                        type="text"
+                        className="form-control auth-input"
+                        name="iconClass"
+                        value={formData.iconClass}
+                        onChange={handleInputChange}
+                        placeholder="e.g. fas fa-tools"
+                      />
                     </div>
+
+                    {formData.iconClass && (
+                      <div className="admin-category-modal-preview">
+                        <span className="text-secondary small d-block mb-2">
+                          Preview
+                        </span>
+                        <div className="admin-category-preview">
+                          <i className={`${formData.iconClass} fa-lg`}></i>
+                        </div>
+                      </div>
+                    )}
                   </div>
-                  <div className="modal-footer">
-                    <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>Cancel</button>
-                    <button type="submit" className="btn btn-primary">{isEditing ? "Update" : "Save"}</button>
+
+                  <div className="modal-footer review-modal-footer border-0">
+                    <button
+                      type="button"
+                      className="btn btn-outline-secondary rounded-pill px-4"
+                      onClick={() => setShowModal(false)}
+                      disabled={saving}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      className="btn btn-primary rounded-pill px-4"
+                      disabled={saving}
+                    >
+                      {saving ? (
+                        <>
+                          <i className="fas fa-spinner fa-spin me-2"></i>
+                          Saving...
+                        </>
+                      ) : isEditing ? (
+                        "Update"
+                      ) : (
+                        "Save"
+                      )}
+                    </button>
                   </div>
                 </form>
               </div>

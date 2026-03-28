@@ -1,11 +1,24 @@
 import React, { useEffect, useState } from "react";
-import { getAllCustomers, updateUserStatus } from "../../services/api"; 
+import { getAllCustomers, updateUserStatus } from "../../services/api";
+import ModalAlert from "../../components/ModalAlert";
 
 const GetAllUsers = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [confirmConfig, setConfirmConfig] = useState({
+    isOpen: false,
+    userId: null,
+    newStatus: false,
+    actionLabel: "",
+  });
+  const [modalConfig, setModalConfig] = useState({
+    isOpen: false,
+    type: "",
+    title: "",
+    message: "",
+    actions: [],
+  });
 
-  // Fetch Users on Load
   useEffect(() => {
     fetchUsers();
   }, []);
@@ -21,128 +34,229 @@ const GetAllUsers = () => {
     }
   };
 
-  // Handle Block/Unblock
-  const handleStatusChange = async (id, currentStatus) => {
-    const newStatus = !currentStatus; // Toggle status
-    const action = newStatus ? "ACTIVATE" : "BLOCK";
-    
-    if (!window.confirm(`Are you sure you want to ${action} this user?`)) return;
+  const closeModal = () => {
+    setModalConfig((prev) => ({ ...prev, isOpen: false }));
+  };
 
+  const closeConfirm = () => {
+    setConfirmConfig({
+      isOpen: false,
+      userId: null,
+      newStatus: false,
+      actionLabel: "",
+    });
+  };
+
+  const handleStatusChange = (id, currentStatus) => {
+    const newStatus = !currentStatus;
+    const actionLabel = newStatus ? "activate" : "block";
+
+    setConfirmConfig({
+      isOpen: true,
+      userId: id,
+      newStatus,
+      actionLabel,
+    });
+  };
+
+  const confirmStatusChange = async () => {
     try {
-      await updateUserStatus(id, newStatus);
-      
-      // Update UI locally without refreshing
+      const { userId, newStatus } = confirmConfig;
+
+      await updateUserStatus(userId, newStatus);
+
       setUsers((prev) =>
-        prev.map((u) => (u.id === id ? { ...u, isActive: newStatus } : u))
+        prev.map((u) => (u.id === userId ? { ...u, isActive: newStatus } : u))
       );
+
+      closeConfirm();
+
+      setModalConfig({
+        isOpen: true,
+        type: "success",
+        title: "Status Updated",
+        message: `The user has been successfully ${
+          newStatus ? "activated" : "blocked"
+        }.`,
+        actions: [{ label: "OK" }],
+      });
     } catch (error) {
-      alert("Failed to update status");
+      closeConfirm();
+
+      setModalConfig({
+        isOpen: true,
+        type: "error",
+        title: "Update Failed",
+        message: "Failed to update user status.",
+        actions: [{ label: "Close" }],
+      });
     }
   };
 
-  if (loading) return <div className="p-4">Loading users...</div>;
+  const getStatusBadgeClass = (isActive) =>
+    isActive ? "booking-status-confirmed" : "booking-status-cancelled";
+
+  if (loading) {
+    return (
+      <>
+        {modalConfig.isOpen && (
+          <ModalAlert
+            type={modalConfig.type}
+            title={modalConfig.title}
+            message={modalConfig.message}
+            actions={modalConfig.actions}
+            onClose={closeModal}
+          />
+        )}
+
+        <section className="admin-page">
+          <div className="card app-card border-0 text-center p-4 p-md-5">
+            <div className="spinner-border text-primary mb-3" role="status"></div>
+            <p className="mb-0 text-secondary">Loading users...</p>
+          </div>
+        </section>
+      </>
+    );
+  }
 
   return (
     <>
-      <div className="">
-        <div className="content-header">
-          <div className="container-fluid">
-            <h1 className="m-0">Manage Users</h1>
+      {modalConfig.isOpen && (
+        <ModalAlert
+          type={modalConfig.type}
+          title={modalConfig.title}
+          message={modalConfig.message}
+          actions={modalConfig.actions}
+          onClose={closeModal}
+        />
+      )}
+
+      {confirmConfig.isOpen && (
+        <ModalAlert
+          type="info"
+          title="Confirm Action"
+          message={`Are you sure you want to ${confirmConfig.actionLabel} this user?`}
+          actions={[
+            { label: "Proceed", onClick: confirmStatusChange },
+            { label: "Cancel", onClick: closeConfirm },
+          ]}
+          onClose={closeConfirm}
+        />
+      )}
+
+      <section className="admin-page">
+        <div className="admin-page-header mb-4">
+          <div>
+            <span className="badge rounded-pill text-bg-light border px-3 py-2 mb-2">
+              Admin Panel
+            </span>
+            <h1 className="admin-page-title mb-2">Manage Users</h1>
+            <p className="text-secondary mb-0">
+              Review customer accounts and manage their active status.
+            </p>
           </div>
         </div>
 
-        <div className="content">
-          <div className="container-fluid">
-            <div className="card">
-              <div className="card-header d-flex justify-content-between">
-                <h3 className="card-title">System Users (Customers)</h3>
+        <div className="card app-card border-0 admin-table-card">
+          <div className="card-body p-0">
+            <div className="p-4 pb-3 border-bottom">
+              <h2 className="h5 fw-semibold mb-1">System Users (Customers)</h2>
+              <p className="text-secondary mb-0">
+                All registered customer accounts on the platform.
+              </p>
+            </div>
+
+            {users.length === 0 ? (
+              <div className="text-center p-4 p-md-5">
+                <div className="search-empty-icon mb-3">
+                  <i className="fas fa-users-slash"></i>
+                </div>
+                <h5 className="fw-semibold mb-2">No customers found</h5>
+                <p className="text-secondary mb-0">
+                  Customer accounts will appear here once available.
+                </p>
               </div>
-              <div className="card-body p-0 table-responsive">
-                <table
-                  id="usersTable"
-                  className="table table-striped table-hover"
-                >
+            ) : (
+              <div className="table-responsive">
+                <table className="table align-middle mb-0 admin-data-table">
                   <thead>
                     <tr>
-                      <th style={{width: "50px"}}>Avatar</th>
+                      <th>Avatar</th>
                       <th>Name & Email</th>
                       <th>Phone</th>
                       <th>City</th>
                       <th>Role</th>
                       <th>Status</th>
-                      <th style={{width: "120px"}}>Actions</th>
+                      <th className="text-end">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {users.length === 0 ? (
-                      <tr><td colSpan="7" className="text-center p-3">No customers found.</td></tr>
-                    ) : (
-                      users.map((user) => (
-                        <tr key={user.id}>
-                          {/* Avatar */}
-                          <td className="text-center align-middle">
-                            <div className="bg-light rounded-circle border d-flex align-items-center justify-content-center mx-auto" style={{width:"35px", height:"35px"}}>
-                                <span className="fw-bold text-secondary">{user.fullName.charAt(0).toUpperCase()}</span>
-                            </div>
-                          </td>
+                    {users.map((user) => (
+                      <tr key={user.id}>
+                        <td>
+                          <div className="admin-provider-avatar">
+                            {user.fullName?.charAt(0).toUpperCase()}
+                          </div>
+                        </td>
 
-                          {/* Name/Email */}
-                          <td className="align-middle">
-                            <strong>{user.fullName}</strong>
-                            <br/>
-                            <small className="text-muted">{user.email}</small>
-                          </td>
+                        <td>
+                          <div className="fw-semibold">{user.fullName}</div>
+                          <div className="text-secondary small">{user.email}</div>
+                        </td>
 
-                          {/* Phone */}
-                          <td className="align-middle">{user.phoneNumber || "N/A"}</td>
+                        <td>{user.phoneNumber || "N/A"}</td>
+                        <td>{user.city || "N/A"}</td>
 
-                          {/* City */}
-                          <td className="align-middle">{user.city || "N/A"}</td>
+                        <td>
+                          <span className="badge rounded-pill text-bg-light border px-3 py-2">
+                            Customer
+                          </span>
+                        </td>
 
-                          {/* Role */}
-                          <td className="align-middle">
-                             <span className="badge bg-primary">Customer</span>
-                          </td>
+                        <td>
+                          <span
+                            className={`booking-status-badge ${getStatusBadgeClass(
+                              user.isActive
+                            )}`}
+                          >
+                            {user.isActive ? "Active" : "Blocked"}
+                          </span>
+                        </td>
 
-                          {/* Status Badge */}
-                          <td className="align-middle">
-                            {user.isActive ? (
-                                <span className="badge bg-success">Active</span>
-                            ) : (
-                                <span className="badge bg-danger">Blocked</span>
-                            )}
-                          </td>
-
-                          {/* Actions (Block/Unblock) */}
-                          <td className="align-middle">
-                            {user.isActive ? (
-                                <button 
-                                    onClick={() => handleStatusChange(user.id, user.isActive)}
-                                    className="btn btn-sm btn-outline-danger w-100"
-                                    title="Block User"
-                                >
-                                    <i className="fas fa-ban me-1"></i> Block
-                                </button>
-                            ) : (
-                                <button 
-                                    onClick={() => handleStatusChange(user.id, user.isActive)}
-                                    className="btn btn-sm btn-success w-100"
-                                    title="Unblock User"
-                                >
-                                    <i className="fas fa-unlock me-1"></i> Unblock
-                                </button>
-                            )}
-                          </td>
-                        </tr>
-                      ))
-                    )}
+                        <td className="text-end">
+                          {user.isActive ? (
+                            <button
+                              onClick={() =>
+                                handleStatusChange(user.id, user.isActive)
+                              }
+                              className="btn btn-sm btn-outline-danger rounded-pill px-3"
+                              title="Block User"
+                            >
+                              <i className="fas fa-ban me-1"></i>
+                              Block
+                            </button>
+                          ) : (
+                            <button
+                              onClick={() =>
+                                handleStatusChange(user.id, user.isActive)
+                              }
+                              className="btn btn-sm btn-success rounded-pill px-3"
+                              title="Unblock User"
+                            >
+                              <i className="fas fa-unlock me-1"></i>
+                              Unblock
+                            </button>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
                   </tbody>
                 </table>
               </div>
-            </div>
+            )}
           </div>
         </div>
-      </div>
+      </section>
     </>
   );
 };

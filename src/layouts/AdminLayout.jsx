@@ -1,25 +1,21 @@
 import React from "react";
-
-import AdminSidebar from "../components/AdminSidebar";
 import { Outlet } from "react-router-dom";
+import AdminSidebar from "../components/AdminSidebar";
 import AdminFooter from "../components/AdminFooter";
 
 const AdminLayout = () => {
   return (
-    <>
-      <div className="hold-transition sidebar-mini layout-fixed">
-        <div className="wrapper">
-          <AdminSidebar />
+    <div className="admin-layout">
+      <AdminSidebar />
 
-          <div className="content-wrapper">
-            <Outlet />
-          </div>
+      <div className="admin-main">
+        <main className="admin-content">
+          <Outlet />
+        </main>
 
-          {/* Footer */}
-          <AdminFooter />
-        </div>
+        <AdminFooter />
       </div>
-    </>
+    </div>
   );
 };
 

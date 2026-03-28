@@ -3,94 +3,203 @@ import { NavLink } from "react-router-dom";
 import { logoutUser } from "../services/authService";
 
 const AdminSidebar = () => {
+  const sidebarLinkClass = ({ isActive }) =>
+    `admin-sidebar-link ${isActive ? "active" : ""}`;
+
   return (
     <>
-      <nav className="main-header navbar navbar-expand navbar-white navbar-light">
-        <ul className="navbar-nav">
-          <li className="nav-item">
-            <a
-              className="nav-link"
-              data-widget="pushmenu"
-              href="#"
-              role="button"
-            >
-              <i className="fas fa-bars"></i>
-            </a>
-          </li>
-          <li className="nav-item d-none d-sm-inline-block">
-            <NavLink end to="/admin" className="nav-link">
-              Dashboard
-            </NavLink>
-          </li>
-        </ul>
+      <header className="admin-topbar d-lg-none">
+        <div className="container-fluid d-flex align-items-center justify-content-between">
+          <NavLink to="/admin" className="admin-mobile-brand text-decoration-none">
+            Skill Square
+          </NavLink>
 
-        <ul className="navbar-nav ms-auto">
-          <li className="nav-item">
-            <NavLink to="/admin/profile" className="nav-link">
-              Profile
+          <button
+            className="btn admin-topbar-icon"
+            type="button"
+            data-bs-toggle="offcanvas"
+            data-bs-target="#adminSidebarDrawer"
+            aria-controls="adminSidebarDrawer"
+          >
+            <i className="fas fa-bars"></i>
+          </button>
+        </div>
+      </header>
+
+      <aside className="admin-sidebar d-none d-lg-flex">
+        <div className="admin-sidebar-inner">
+          <div className="admin-sidebar-brand">
+            <h5 className="mb-0 fw-bold">Skill Square</h5>
+            <p className="mb-0 text-secondary small">Admin Panel</p>
+          </div>
+
+          <nav className="admin-sidebar-nav">
+            <NavLink end to="/admin" className={sidebarLinkClass}>
+              <i className="fas fa-th-large"></i>
+              <span>Dashboard</span>
             </NavLink>
-          </li>
-          <li className="nav-item">
-            <NavLink onClick={logoutUser} to="/" className="nav-link text-danger">
+
+            <div className="admin-sidebar-label">Management</div>
+
+            <NavLink to="/admin/getAllUsers" className={sidebarLinkClass}>
+              <i className="fas fa-users"></i>
+              <span>Users</span>
+            </NavLink>
+
+            <NavLink to="/admin/getAllProviders" className={sidebarLinkClass}>
+              <i className="fas fa-user-tie"></i>
+              <span>Providers</span>
+            </NavLink>
+
+            <NavLink to="/admin/getAllcategories" className={sidebarLinkClass}>
+              <i className="fas fa-th-list"></i>
+              <span>Categories</span>
+            </NavLink>
+
+            <NavLink to="/admin/getAllbookings" className={sidebarLinkClass}>
+              <i className="fas fa-calendar-check"></i>
+              <span>Bookings</span>
+            </NavLink>
+
+            <NavLink to="/admin/getAllReviews" className={sidebarLinkClass}>
+              <i className="fas fa-star"></i>
+              <span>Reviews</span>
+            </NavLink>
+
+            
+          </nav>
+
+          <div className="admin-sidebar-bottom">
+            <NavLink to="/" className="admin-sidebar-secondary text-decoration-none">
+              <i className="fas fa-globe me-2"></i>
+              View Site
+            </NavLink>
+
+            <NavLink
+              onClick={logoutUser}
+              to="/"
+              className="admin-sidebar-logout text-decoration-none"
+            >
+              <i className="fas fa-sign-out-alt me-2"></i>
               Logout
             </NavLink>
-          </li>
-        </ul>
-      </nav>
-
-      <aside className="main-sidebar sidebar-dark-primary elevation-4">
-        <NavLink to="/admin" className="brand-link ">
-          <span className="brand-text ms-2" style={{ textDecoration: "none" }}>
-            Skill Square
-          </span>
-        </NavLink>
-
-        <div className="sidebar">
-          <nav className="mt-2">
-            <ul className="nav nav-pills nav-sidebar flex-column" role="menu">
-              <li className="nav-item">
-                <NavLink end to="/admin" className="nav-link">
-                  <i className="nav-icon fas fa-tachometer-alt"></i>
-                  <p>Dashboard</p>
-                </NavLink>
-              </li>
-
-              <li className="nav-header">MANAGEMENT</li>
-
-              <li className="nav-item">
-                <NavLink to="/admin/getAllUsers" className="nav-link">
-                  <i className="nav-icon fas fa-users"></i>
-                  <p>Users</p>
-                </NavLink>
-              </li>
-              <li className="nav-item">
-                <NavLink to="/admin/getAllProviders" className="nav-link">
-                  <i className="nav-icon fas fa-user-tie"></i>
-                  <p>Providers</p>
-                </NavLink>
-              </li>
-              <li className="nav-item">
-                <NavLink to="/admin/getAllcategories" className="nav-link">
-                  <i className="nav-icon fas fa-th-list"></i>
-                  <p>Categories</p>
-                </NavLink>
-              </li>
-              <li className="nav-item">
-                <NavLink to="/admin/getAllbookings" className="nav-link">
-                  <i className="nav-icon fas fa-calendar-check"></i>
-                  <p>Bookings</p>
-                </NavLink>
-              </li>
-              <li className="nav-item">
-                <NavLink to="/admin/getAllReviews" className="nav-link">
-                  <i className="nav-icon fas fa-star"></i>
-                  <p>Reviews</p>
-                </NavLink>
-              </li>
-            </ul>
-          </nav>
+          </div>
         </div>
       </aside>
+
+      <div
+        className="offcanvas offcanvas-start admin-mobile-drawer"
+        tabIndex="-1"
+        id="adminSidebarDrawer"
+        aria-labelledby="adminSidebarDrawerLabel"
+      >
+        <div className="offcanvas-header">
+          <div>
+            <h5 className="mb-0 fw-bold" id="adminSidebarDrawerLabel">
+              Skill Square
+            </h5>
+            <p className="mb-0 text-secondary small">Admin Panel</p>
+          </div>
+
+          <button
+            type="button"
+            className="btn-close"
+            data-bs-dismiss="offcanvas"
+            aria-label="Close"
+          ></button>
+        </div>
+
+        <div className="offcanvas-body d-flex flex-column">
+          <nav className="admin-sidebar-nav">
+            <NavLink
+              end
+              to="/admin"
+              className={sidebarLinkClass}
+              data-bs-dismiss="offcanvas"
+            >
+              <i className="fas fa-th-large"></i>
+              <span>Dashboard</span>
+            </NavLink>
+
+            <div className="admin-sidebar-label">Management</div>
+
+            <NavLink
+              to="/admin/getAllUsers"
+              className={sidebarLinkClass}
+              data-bs-dismiss="offcanvas"
+            >
+              <i className="fas fa-users"></i>
+              <span>Users</span>
+            </NavLink>
+
+            <NavLink
+              to="/admin/getAllProviders"
+              className={sidebarLinkClass}
+              data-bs-dismiss="offcanvas"
+            >
+              <i className="fas fa-user-tie"></i>
+              <span>Providers</span>
+            </NavLink>
+
+            <NavLink
+              to="/admin/getAllcategories"
+              className={sidebarLinkClass}
+              data-bs-dismiss="offcanvas"
+            >
+              <i className="fas fa-th-list"></i>
+              <span>Categories</span>
+            </NavLink>
+
+            <NavLink
+              to="/admin/getAllbookings"
+              className={sidebarLinkClass}
+              data-bs-dismiss="offcanvas"
+            >
+              <i className="fas fa-calendar-check"></i>
+              <span>Bookings</span>
+            </NavLink>
+
+            <NavLink
+              to="/admin/getAllReviews"
+              className={sidebarLinkClass}
+              data-bs-dismiss="offcanvas"
+            >
+              <i className="fas fa-star"></i>
+              <span>Reviews</span>
+            </NavLink>
+
+            <NavLink
+              to="/admin/profile"
+              className={sidebarLinkClass}
+              data-bs-dismiss="offcanvas"
+            >
+              <i className="fas fa-user"></i>
+              <span>Profile</span>
+            </NavLink>
+          </nav>
+
+          <div className="admin-sidebar-bottom mt-auto">
+            <NavLink
+              to="/"
+              className="admin-sidebar-secondary text-decoration-none"
+              data-bs-dismiss="offcanvas"
+            >
+              <i className="fas fa-globe me-2"></i>
+              View Site
+            </NavLink>
+
+            <NavLink
+              onClick={logoutUser}
+              to="/"
+              className="admin-sidebar-logout text-decoration-none"
+              data-bs-dismiss="offcanvas"
+            >
+              <i className="fas fa-sign-out-alt me-2"></i>
+              Logout
+            </NavLink>
+          </div>
+        </div>
+      </div>
     </>
   );
 };
