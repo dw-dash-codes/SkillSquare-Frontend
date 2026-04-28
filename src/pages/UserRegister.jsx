@@ -89,193 +89,128 @@ const UserRegister = () => {
         />
       )}
 
-      <section className="app-section app-section-hero auth-page">
+      <section className="app-section bg-light min-vh-100 d-flex align-items-center py-5" style={{ paddingTop: '100px' }}>
         <div className="container">
           <div className="row justify-content-center">
-            <div className="col-xxl-10 col-xl-11">
-              <div className="card app-card border-0 auth-card overflow-hidden">
-                <div className="row g-0">
-                  <div className="col-lg-6">
-                    <div className="auth-form-panel p-4 p-md-5">
-                      <div className="auth-form-header text-center text-lg-start mb-4">
-                        <div className="auth-icon-circle mb-3">
-                          <i className="fas fa-user-plus"></i>
-                        </div>
-
-                        <span className="badge rounded-pill text-bg-light border px-3 py-2 mb-3">
-                          Create Account
-                        </span>
-
-                        <h1 className="h3 fw-bold mb-2">
-                          Register as {role}
-                        </h1>
-
-                        <p className="text-secondary mb-0">
-                          Create your account and start connecting with trusted
-                          services in your area.
-                        </p>
-                      </div>
-
-                      <form onSubmit={handleSubmit} className="auth-form">
-                        <div className="row g-3">
-                          <div className="col-md-6">
-                            <label className="form-label auth-label">
-                              First Name
-                            </label>
-                            <input
-                              type="text"
-                              name="firstName"
-                              className="form-control auth-input"
-                              placeholder="Enter first name"
-                              value={formData.firstName}
-                              onChange={handleChange}
-                              required
-                            />
-                          </div>
-
-                          <div className="col-md-6">
-                            <label className="form-label auth-label">
-                              Last Name
-                            </label>
-                            <input
-                              type="text"
-                              name="lastName"
-                              className="form-control auth-input"
-                              placeholder="Enter last name"
-                              value={formData.lastName}
-                              onChange={handleChange}
-                              required
-                            />
-                          </div>
-
-                          <div className="col-12">
-                            <label className="form-label auth-label">
-                              Email Address
-                            </label>
-                            <input
-                              type="email"
-                              className="form-control auth-input"
-                              placeholder="Enter email address"
-                              name="email"
-                              value={formData.email}
-                              onChange={handleChange}
-                              required
-                            />
-                          </div>
-
-                          <div className="col-md-6">
-                            <label className="form-label auth-label">
-                              Phone Number
-                            </label>
-                            <input
-                              type="tel"
-                              className="form-control auth-input"
-                              placeholder="Enter phone number"
-                              name="phoneNumber"
-                              value={formData.phoneNumber}
-                              onChange={handleChange}
-                            />
-                          </div>
-
-                          <div className="col-md-6">
-                            <label className="form-label auth-label">
-                              City
-                            </label>
-                            <input
-                              type="text"
-                              className="form-control auth-input"
-                              placeholder="Enter city"
-                              name="city"
-                              value={formData.city}
-                              onChange={handleChange}
-                            />
-                          </div>
-
-                          <div className="col-12">
-                            <label className="form-label auth-label">
-                              Address
-                            </label>
-                            <input
-                              type="text"
-                              className="form-control auth-input"
-                              placeholder="Enter address"
-                              name="address"
-                              value={formData.address}
-                              onChange={handleChange}
-                            />
-                          </div>
-
-                          <div className="col-12">
-                            <label className="form-label auth-label">
-                              Password
-                            </label>
-                            <input
-                              type="password"
-                              className="form-control auth-input"
-                              placeholder="Enter password"
-                              name="password"
-                              value={formData.password}
-                              onChange={handleChange}
-                              required
-                            />
-                          </div>
-                        </div>
-
-                        <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mt-4">
-                          <div className="form-check m-0">
-                            <input
-                              className="form-check-input"
-                              type="checkbox"
-                              id="agreeTermsUser"
-                              required
-                            />
-                            <label
-                              className="form-check-label text-secondary"
-                              htmlFor="agreeTermsUser"
-                            >
-                              I agree to Terms & Conditions
-                            </label>
-                          </div>
-
-                          <Link to="/login" className="auth-link text-decoration-none">
-                            Already have an account?
-                          </Link>
-                        </div>
-
-                        <button
-                          type="submit"
-                          className="btn btn-primary w-100 rounded-pill py-3 fw-semibold mt-4"
-                          disabled={loading}
-                        >
-                          {loading ? (
-                            <span>
-                              <i className="fas fa-spinner fa-spin me-2"></i>
-                              Registering...
-                            </span>
-                          ) : (
-                            <>
-                              <i className="fas fa-rocket me-2"></i>
-                              Register as {role}
-                            </>
-                          )}
-                        </button>
-                      </form>
-                    </div>
+            {/* Centered Compact Card */}
+            <div className="col-md-8 mt-5 col-lg-7 col-xl-6 col-xxl-5">
+              <div className="card app-card border-0 rounded-4 shadow-lg bg-white">
+                <div className="p-4 p-md-5">
+                  <div className="text-center mb-4">
+                    <h1 className="font-display fw-bold text-dark mb-2">
+                      Create your account
+                    </h1>
+                    <p className="text-secondary font-body mb-0">
+                      Join SkillSquare today to find trusted professionals
+                    </p>
                   </div>
 
-                  <div className="col-lg-6 d-none d-lg-block">
-                    <div className="auth-side-panel h-100">
-                      <div className="auth-side-content text-center">
-                        <div className="auth-side-emoji mb-4">🚀</div>
-                        <h3 className="fw-bold mb-3">Join Our Community</h3>
-                        <p className="text-secondary mb-0">
-                          Build your account and connect with reliable local
-                          service providers in a cleaner and more modern
-                          platform experience.
-                        </p>
+                  <form onSubmit={handleSubmit} className="font-body">
+                    <div className="row g-3">
+                      <div className="col-sm-6">
+                        <label className="form-label fw-bold text-dark small mb-1">First Name</label>
+                        <input
+                          type="text"
+                          name="firstName"
+                          className="form-control px-3 py-2 bg-light border-0 shadow-none"
+                          style={{ borderRadius: '0.75rem' }}
+                          value={formData.firstName}
+                          onChange={handleChange}
+                          required
+                        />
+                      </div>
+
+                      <div className="col-sm-6">
+                        <label className="form-label fw-bold text-dark small mb-1">Last Name</label>
+                        <input
+                          type="text"
+                          name="lastName"
+                          className="form-control px-3 py-2 bg-light border-0 shadow-none"
+                          style={{ borderRadius: '0.75rem' }}
+                          value={formData.lastName}
+                          onChange={handleChange}
+                          required
+                        />
+                      </div>
+
+                      <div className="col-12">
+                        <label className="form-label fw-bold text-dark small mb-1">Email Address</label>
+                        <input
+                          type="email"
+                          name="email"
+                          className="form-control px-3 py-2 bg-light border-0 shadow-none"
+                          style={{ borderRadius: '0.75rem' }}
+                          value={formData.email}
+                          onChange={handleChange}
+                          required
+                        />
+                      </div>
+                      
+                      <div className="col-12">
+                        <label className="form-label fw-bold text-dark small mb-1">Password</label>
+                        <input
+                          type="password"
+                          name="password"
+                          className="form-control px-3 py-2 bg-light border-0 shadow-none"
+                          style={{ borderRadius: '0.75rem' }}
+                          value={formData.password}
+                          onChange={handleChange}
+                          required
+                        />
+                      </div>
+
+                      <div className="col-sm-6">
+                        <label className="form-label fw-bold text-dark small mb-1">Phone Number</label>
+                        <input
+                          type="tel"
+                          name="phoneNumber"
+                          className="form-control px-3 py-2 bg-light border-0 shadow-none"
+                          style={{ borderRadius: '0.75rem' }}
+                          value={formData.phoneNumber}
+                          onChange={handleChange}
+                        />
+                      </div>
+
+                      <div className="col-sm-6">
+                        <label className="form-label fw-bold text-dark small mb-1">City</label>
+                        <input
+                          type="text"
+                          name="city"
+                          className="form-control px-3 py-2 bg-light border-0 shadow-none"
+                          style={{ borderRadius: '0.75rem' }}
+                          value={formData.city}
+                          onChange={handleChange}
+                        />
+                      </div>
+
+                      <div className="col-12">
+                        <label className="form-label fw-bold text-dark small mb-1">Address</label>
+                        <input
+                          type="text"
+                          name="address"
+                          className="form-control px-3 py-2 bg-light border-0 shadow-none"
+                          style={{ borderRadius: '0.75rem' }}
+                          value={formData.address}
+                          onChange={handleChange}
+                        />
                       </div>
                     </div>
-                  </div>
+
+                    <button
+                      type="submit"
+                      className="btn btn-gradient-warm w-100 rounded-pill py-3 fw-bold mt-4 shadow-warm"
+                      disabled={loading}
+                    >
+                      {loading ? "Creating account..." : "Create Account"}
+                    </button>
+                    
+                    <p className="mt-4 text-center text-secondary small mb-0">
+                      Already have an account?{" "}
+                      <Link to="/login" className="text-decoration-none fw-bold hover-primary" style={{ color: 'var(--app-primary)' }}>
+                        Sign in
+                      </Link>
+                    </p>
+                  </form>
                 </div>
               </div>
             </div>

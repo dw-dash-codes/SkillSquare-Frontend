@@ -1,16 +1,37 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Playfair+Display:wght@600;700;800&display=swap');
+
 :root {
-  --app-bg: #f8fafc;
-  --app-surface: #ffffff;
-  --app-surface-muted: #f1f5f9;
-  --app-border: #e2e8f0;
-  --app-text: #0f172a;
-  --app-text-muted: #64748b;
-  --app-primary: #0d6efd;
-  --app-shadow-sm: 0 8px 24px rgba(15, 23, 42, 0.06);
-  --app-shadow-md: 0 18px 45px rgba(15, 23, 42, 0.08);
-  --app-radius: 1rem;
-  --app-radius-lg: 1.5rem;
-  --app-transition: all 0.25s ease;
+  /* 2. Update your existing primary color to Lovable's Warm Color */
+  --app-primary: #f27a21; /* Blue ki jagah ye warm orange use hoga */
+  
+  /* 3. Add Lovable Specific Variables */
+  --font-display: 'Playfair Display', serif;
+  --font-body: 'DM Sans', sans-serif;
+  --gradient-warm: linear-gradient(135deg, #f27a21 0%, #f69d3c 100%);
+  --shadow-warm: 0 4px 20px rgba(242, 122, 33, 0.25);
+  --app-text: #1a1512; /* Slightly warmer dark text */
+}
+
+/* 4. Apply Fonts Globally */
+body {
+  font-family: var(--font-body) !important;
+}
+
+h1, h2, h3, h4, h5, h6, .font-display, .navbar-brand {
+  font-family: var(--font-display) !important;
+}
+
+/* 5. Utility class for gradient buttons (Jo hum Navbar me use karenge) */
+.btn-gradient-warm {
+  background: var(--gradient-warm);
+  color: #fff !important;
+  border: none;
+  box-shadow: var(--shadow-warm);
+  transition: all 0.3s ease;
+}
+.btn-gradient-warm:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 25px rgba(242, 122, 33, 0.35);
 }
 
 body {
@@ -18,12 +39,10 @@ body {
   color: var(--app-text);
 }
 
-.app-main {
-  padding-top: 88px;
-}
+
 
 .app-section {
-  padding: 5rem 0;
+  padding: 3rem 0;
 }
 
 .app-section-hero {
@@ -115,10 +134,7 @@ body {
   transition: var(--app-transition);
 }
 
-.app-card:hover {
-  transform: translateY(-6px);
-  box-shadow: var(--app-shadow-md);
-}
+
 
 .app-icon-circle,
 .app-avatar-circle,
@@ -1725,4 +1741,11 @@ body {
 .admin-review-stars i {
   margin-right: 2px;
   font-size: 0.85rem;
+}
+
+.hover-primary {
+  transition: color 0.3s ease;
+}
+.hover-primary:hover {
+  color: var(--app-primary) !important;
 }

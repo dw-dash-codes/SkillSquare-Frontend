@@ -163,9 +163,9 @@ const Profile = () => {
   if (loading) {
     return (
       <section className="provider-page">
-        <div className="card app-card border-0 text-center p-4 p-md-5">
-          <div className="spinner-border text-primary mb-3" role="status"></div>
-          <p className="mb-0 text-secondary">Loading profile...</p>
+        <div className="card app-card border rounded-4 text-center p-5 shadow-sm bg-white" style={{ borderColor: 'var(--app-border)' }}>
+          <div className="spinner-border text-primary mb-3" style={{ width: '3rem', height: '3rem' }} role="status"></div>
+          <p className="mb-0 text-secondary font-body">Loading your profile...</p>
         </div>
       </section>
     );
@@ -174,172 +174,211 @@ const Profile = () => {
   return (
     <>
       {modalConfig.isOpen && (
-        <ModalAlert
-          type={modalConfig.type}
-          title={modalConfig.title}
-          message={modalConfig.message}
-          actions={modalConfig.actions}
-          onClose={closeModal}
-        />
+        <div className="review-alert-layer" style={{ zIndex: 1060 }}>
+          <ModalAlert
+            type={modalConfig.type}
+            title={modalConfig.title}
+            message={modalConfig.message}
+            actions={modalConfig.actions}
+            onClose={closeModal}
+          />
+        </div>
       )}
 
-      <section className="provider-page">
-        <div className="provider-page-header mb-4">
-          <div>
-            <span className="badge rounded-pill text-bg-light border px-3 py-2 mb-2">
-              Provider Panel
-            </span>
-            <h1 className="provider-page-title mb-2">My Profile</h1>
-            <p className="text-secondary mb-0">
-              Update your personal details and service information.
-            </p>
-          </div>
+      <section className="provider-page" style={{ margin: '-2rem', padding: '2rem' }}>
+        
+        {/* Page Header */}
+        <div className="mb-5">
+          <span className="badge rounded-pill px-3 py-1 mb-3 fw-medium" style={{ background: 'rgba(242, 122, 33, 0.1)', color: 'var(--app-primary)' }}>
+            Provider Settings
+          </span>
+          <h1 className="font-display fw-bold text-dark mb-2">My Profile</h1>
+          <p className="text-secondary font-body mb-0">
+            Update your personal details and service information.
+          </p>
         </div>
 
-        <div className="card app-card border-0 provider-profile-card">
-          <div className="card-body p-4 p-lg-5">
-            <form onSubmit={handleSubmit}>
-              <div className="row g-3">
-                <div className="col-md-6">
-                  <label className="form-label auth-label">First Name</label>
-                  <input
-                    name="firstName"
-                    className="form-control auth-input"
-                    value={form.firstName}
-                    onChange={handleChange}
-                  />
-                </div>
+        <div className="row justify-content-center">
+          <div className="col-12">
+            <div className="card app-card border rounded-4 shadow-sm bg-white overflow-hidden" style={{ borderColor: '#cbd5e1' }}>
+              <div className="card-body p-4 p-lg-5">
+                <form onSubmit={handleSubmit} className="font-body">
+                  
+                  {/* --- Personal Details Section --- */}
+                  <h4 className="font-display fw-bold text-dark mb-4 border-bottom pb-3">
+                    <i className="fas fa-user-circle me-2" style={{ color: 'var(--app-primary)' }}></i>
+                    Personal Details
+                  </h4>
+                  
+                  <div className="row g-4 mb-5">
+                    <div className="col-md-6">
+                      <label className="form-label fw-bold text-dark small mb-1">First Name</label>
+                      <input
+                        name="firstName"
+                        className="form-control px-3 py-2 bg-light border-0 shadow-none"
+                        style={{ borderRadius: '0.75rem' }}
+                        value={form.firstName}
+                        onChange={handleChange}
+                        required
+                      />
+                    </div>
 
-                <div className="col-md-6">
-                  <label className="form-label auth-label">Last Name</label>
-                  <input
-                    name="lastName"
-                    className="form-control auth-input"
-                    value={form.lastName}
-                    onChange={handleChange}
-                  />
-                </div>
+                    <div className="col-md-6">
+                      <label className="form-label fw-bold text-dark small mb-1">Last Name</label>
+                      <input
+                        name="lastName"
+                        className="form-control px-3 py-2 bg-light border-0 shadow-none"
+                        style={{ borderRadius: '0.75rem' }}
+                        value={form.lastName}
+                        onChange={handleChange}
+                        required
+                      />
+                    </div>
 
-                <div className="col-md-6">
-                  <label className="form-label auth-label">Email</label>
-                  <input
-                    className="form-control auth-input bg-light"
-                    value={form.email}
-                    disabled
-                  />
-                </div>
+                    <div className="col-md-6">
+                      <label className="form-label fw-bold text-dark small mb-1">Email Address</label>
+                      <input
+                        className="form-control px-3 py-2 border-0 shadow-none"
+                        style={{ borderRadius: '0.75rem', background: '#e2e8f0', color: '#64748b' }}
+                        value={form.email}
+                        disabled
+                        title="Email cannot be changed"
+                      />
+                    </div>
 
-                <div className="col-md-6">
-                  <label className="form-label auth-label">Phone</label>
-                  <input
-                    name="phoneNumber"
-                    className="form-control auth-input"
-                    value={form.phoneNumber}
-                    onChange={handleChange}
-                  />
-                </div>
+                    <div className="col-md-6">
+                      <label className="form-label fw-bold text-dark small mb-1">Phone Number</label>
+                      <input
+                        name="phoneNumber"
+                        className="form-control px-3 py-2 bg-light border-0 shadow-none"
+                        style={{ borderRadius: '0.75rem' }}
+                        value={form.phoneNumber}
+                        onChange={handleChange}
+                        required
+                      />
+                    </div>
 
-                <div className="col-md-4">
-                  <label className="form-label auth-label">City</label>
-                  <input
-                    name="city"
-                    className="form-control auth-input"
-                    value={form.city}
-                    onChange={handleChange}
-                  />
-                </div>
+                    <div className="col-md-4">
+                      <label className="form-label fw-bold text-dark small mb-1">City</label>
+                      <input
+                        name="city"
+                        className="form-control px-3 py-2 bg-light border-0 shadow-none"
+                        style={{ borderRadius: '0.75rem' }}
+                        value={form.city}
+                        onChange={handleChange}
+                      />
+                    </div>
 
-                <div className="col-md-4">
-                  <label className="form-label auth-label">Area</label>
-                  <input
-                    name="area"
-                    className="form-control auth-input"
-                    value={form.area}
-                    onChange={handleChange}
-                  />
-                </div>
+                    <div className="col-md-4">
+                      <label className="form-label fw-bold text-dark small mb-1">Area / Sector</label>
+                      <input
+                        name="area"
+                        className="form-control px-3 py-2 bg-light border-0 shadow-none"
+                        style={{ borderRadius: '0.75rem' }}
+                        value={form.area}
+                        onChange={handleChange}
+                      />
+                    </div>
 
-                <div className="col-md-4">
-                  <label className="form-label auth-label">Hourly Rate</label>
-                  <input
-                    type="number"
-                    name="hourlyRate"
-                    className="form-control auth-input"
-                    value={form.hourlyRate}
-                    onChange={handleChange}
-                  />
-                </div>
+                    <div className="col-md-4">
+                      <label className="form-label fw-bold text-dark small mb-1">Address</label>
+                      <input
+                        name="address"
+                        className="form-control px-3 py-2 bg-light border-0 shadow-none"
+                        style={{ borderRadius: '0.75rem' }}
+                        value={form.address}
+                        onChange={handleChange}
+                      />
+                    </div>
+                  </div>
 
-                <div className="col-12">
-                  <label className="form-label auth-label">Address</label>
-                  <input
-                    name="address"
-                    className="form-control auth-input"
-                    value={form.address}
-                    onChange={handleChange}
-                  />
-                </div>
+                  {/* --- Professional Details Section --- */}
+                  <h4 className="font-display fw-bold text-dark mb-4 border-bottom pb-3 mt-4">
+                    <i className="fas fa-briefcase me-2" style={{ color: 'var(--app-primary)' }}></i>
+                    Professional Details
+                  </h4>
 
-                <div className="col-md-6">
-                  <label className="form-label auth-label">Service Category</label>
-                  <select
-                    name="categoryId"
-                    className="form-select auth-input"
-                    value={form.categoryId}
-                    onChange={handleChange}
-                  >
-                    <option value="">Select category</option>
-                    {categories.map((c) => (
-                      <option key={c.id} value={c.id}>
-                        {c.title}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                  <div className="row g-4">
+                    <div className="col-md-6">
+                      <label className="form-label fw-bold text-dark small mb-1">Service Category</label>
+                      <select
+                        name="categoryId"
+                        className="form-select px-3 py-2 bg-light border-0 shadow-none text-dark"
+                        style={{ borderRadius: '0.75rem' }}
+                        value={form.categoryId}
+                        onChange={handleChange}
+                        required
+                      >
+                        <option value="">Select category</option>
+                        {categories.map((c) => (
+                          <option key={c.id} value={c.id}>
+                            {c.title}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
 
-                <div className="col-md-6">
-                  <label className="form-label auth-label">Skills</label>
-                  <input
-                    name="skills"
-                    className="form-control auth-input"
-                    value={form.skills}
-                    onChange={handleChange}
-                    placeholder="e.g. plumbing, pipe fitting, installation"
-                  />
-                </div>
+                    <div className="col-md-6">
+                      <label className="form-label fw-bold text-dark small mb-1">Hourly Rate ($)</label>
+                      <input
+                        type="number"
+                        name="hourlyRate"
+                        className="form-control px-3 py-2 bg-light border-0 shadow-none"
+                        style={{ borderRadius: '0.75rem' }}
+                        value={form.hourlyRate}
+                        onChange={handleChange}
+                        min="0"
+                      />
+                    </div>
 
-                <div className="col-12">
-                  <label className="form-label auth-label">Bio</label>
-                  <textarea
-                    name="bio"
-                    className="form-control auth-input auth-textarea"
-                    rows="5"
-                    value={form.bio}
-                    onChange={handleChange}
-                    placeholder="Write a short description about your services and experience"
-                  />
-                </div>
+                    <div className="col-12">
+                      <label className="form-label fw-bold text-dark small mb-1">Skills (comma separated)</label>
+                      <input
+                        name="skills"
+                        className="form-control px-3 py-2 bg-light border-0 shadow-none"
+                        style={{ borderRadius: '0.75rem' }}
+                        value={form.skills}
+                        onChange={handleChange}
+                        placeholder="e.g. plumbing, pipe fitting, installation"
+                      />
+                    </div>
+
+                    <div className="col-12">
+                      <label className="form-label fw-bold text-dark small mb-1">Professional Bio</label>
+                      <textarea
+                        name="bio"
+                        className="form-control px-3 py-3 bg-light border-0 shadow-none"
+                        style={{ borderRadius: '0.75rem', minHeight: '120px' }}
+                        rows="5"
+                        value={form.bio}
+                        onChange={handleChange}
+                        placeholder="Write a short description about your services and experience..."
+                      />
+                    </div>
+                  </div>
+
+                  <div className="mt-5 pt-3 border-top text-end">
+                    <button
+                      className="btn btn-gradient-warm rounded-pill px-5 py-3 fw-bold shadow-warm"
+                      disabled={saving}
+                    >
+                      {saving ? (
+                        <>
+                          <i className="fas fa-spinner fa-spin me-2"></i>
+                          Saving Changes...
+                        </>
+                      ) : (
+                        <>
+                          <i className="fas fa-save me-2"></i>
+                          Save Profile
+                        </>
+                      )}
+                    </button>
+                  </div>
+                  
+                </form>
               </div>
-
-              <div className="d-flex flex-column flex-sm-row gap-3 mt-4">
-                <button
-                  className="btn btn-primary rounded-pill px-4 py-3 fw-semibold"
-                  disabled={saving}
-                >
-                  {saving ? (
-                    <>
-                      <i className="fas fa-spinner fa-spin me-2"></i>
-                      Saving...
-                    </>
-                  ) : (
-                    <>
-                      <i className="fas fa-save me-2"></i>
-                      Save Profile
-                    </>
-                  )}
-                </button>
-              </div>
-            </form>
+            </div>
           </div>
         </div>
       </section>

@@ -32,7 +32,7 @@ const Footer = () => {
       icon: "fas fa-search",
       title: "Explore More Services",
       description:
-        "Browse trusted categories and discover more professionals for your home and service needs.",
+        "Browse trusted categories and discover professionals for your home and service needs.",
       buttonText: "Browse Services",
       buttonLink: "/categories",
     };
@@ -41,83 +41,96 @@ const Footer = () => {
   const footerCard = getFooterCardContent();
 
   return (
-    <footer className="app-footer border-top mt-auto">
+    <footer className="app-footer border-top mt-auto" style={{ backgroundColor: 'var(--app-surface)' }}>
       <div className="container py-5">
         <div className="row g-4">
-          <div className="col-lg-4 col-md-6">
-            <div className="pe-lg-4">
-              <h5 className="fw-semibold mb-3 d-flex align-items-center gap-2">
-                <i className={`${footerCard.icon} text-primary`}></i>
+          
+          {/* Brand & Dynamic Card Column */}
+          <div className="col-lg-5 col-md-12 pe-lg-4">
+            <NavLink className="align-items-center text-decoration-none mb-4" to="/">
+                <img 
+                  src="hero_logo_1.png" 
+                  alt="SkillSquare" 
+                  style={{ height: '40px', width: 'auto', objectFit: 'contain' }} 
+                />
+              
+            </NavLink>
+            
+            <div className="p-4 rounded-4" style={{ background: 'var(--app-surface-muted)', border: '1px solid var(--app-border)' }}>
+              <h6 className="font-display fw-bold mb-2 d-flex align-items-center gap-2" style={{ color: 'var(--app-text)' }}>
+                <i className={`${footerCard.icon}`} style={{ color: 'var(--app-primary)' }}></i>
                 {footerCard.title}
-              </h5>
-              <p className="text-secondary mb-4">
+              </h6>
+              <p className="text-secondary small font-body mb-3 leading-relaxed">
                 {footerCard.description}
               </p>
               <NavLink
                 to={footerCard.buttonLink}
-                className="btn btn-primary rounded-pill px-4"
+                className="btn btn-gradient-warm rounded-pill px-4 btn-sm font-body fw-medium"
               >
                 {footerCard.buttonText}
               </NavLink>
             </div>
           </div>
 
-          <div className="col-lg-4 col-md-6">
-            <h5 className="fw-semibold mb-3 d-flex align-items-center gap-2">
-              <i className="fas fa-compass text-primary"></i>
-              Navigation
-            </h5>
-            <div className="d-flex flex-column gap-2 footer-links">
-              <a href="#about" className="text-decoration-none">
-                <i className="fas fa-arrow-right me-2 small"></i>
-                About
-              </a>
-              <a href="#services" className="text-decoration-none">
-                <i className="fas fa-arrow-right me-2 small"></i>
-                Services
-              </a>
-              <a href="#contact" className="text-decoration-none">
-                <i className="fas fa-arrow-right me-2 small"></i>
-                Contact Us
-              </a>
+          {/* Navigation Column */}
+          <div className="col-lg-3 col-md-6 offset-lg-1">
+            <h6 className="font-display fw-bold mb-3 d-flex align-items-center gap-2">
+              <i className="fas fa-compass" style={{ color: 'var(--app-primary)' }}></i>
+              Platform
+            </h6>
+            <div className="d-flex flex-column gap-2 footer-links font-body text-secondary small">
+              <NavLink to="/categories" className="text-decoration-none text-secondary hover-primary transition">
+                Browse Services
+              </NavLink>
+              <NavLink to="/getstarted" className="text-decoration-none text-secondary hover-primary transition">
+                Become a Provider
+              </NavLink>
+              <NavLink to="/about" className="text-decoration-none text-secondary hover-primary transition">
+                About Us
+              </NavLink>
+              <NavLink to="/contact" className="text-decoration-none text-secondary hover-primary transition">
+                Help Center & Contact
+              </NavLink>
             </div>
           </div>
 
-          <div className="col-lg-4 col-md-12">
-            <h5 className="fw-semibold mb-3 d-flex align-items-center gap-2">
-              <i className="fas fa-share-alt text-primary"></i>
+          {/* Social Links Column */}
+          <div className="col-lg-3 col-md-6">
+            <h6 className="font-display fw-bold mb-3 d-flex align-items-center gap-2">
+              <i className="fas fa-share-alt" style={{ color: 'var(--app-primary)' }}></i>
               Follow Us
-            </h5>
+            </h6>
             <div className="d-flex gap-2 social-links">
-              <a href="#" target="_blank" rel="noreferrer" className="social-icon">
+              <a href="#" target="_blank" rel="noreferrer" className="social-icon rounded-circle d-flex align-items-center justify-content-center" style={{ width: '38px', height: '38px', background: 'var(--app-surface-muted)', color: 'var(--app-text)' }}>
                 <i className="fab fa-facebook-f"></i>
               </a>
-              <a href="#" target="_blank" rel="noreferrer" className="social-icon">
+              <a href="#" target="_blank" rel="noreferrer" className="social-icon rounded-circle d-flex align-items-center justify-content-center" style={{ width: '38px', height: '38px', background: 'var(--app-surface-muted)', color: 'var(--app-text)' }}>
                 <i className="fab fa-twitter"></i>
               </a>
-              <a href="#" target="_blank" rel="noreferrer" className="social-icon">
+              <a href="#" target="_blank" rel="noreferrer" className="social-icon rounded-circle d-flex align-items-center justify-content-center" style={{ width: '38px', height: '38px', background: 'var(--app-surface-muted)', color: 'var(--app-text)' }}>
                 <i className="fab fa-instagram"></i>
               </a>
-              <a href="#" target="_blank" rel="noreferrer" className="social-icon">
+              <a href="#" target="_blank" rel="noreferrer" className="social-icon rounded-circle d-flex align-items-center justify-content-center" style={{ width: '38px', height: '38px', background: 'var(--app-surface-muted)', color: 'var(--app-text)' }}>
                 <i className="fab fa-linkedin-in"></i>
               </a>
             </div>
           </div>
         </div>
 
-        <hr className="my-4" />
+        <hr className="my-4" style={{ borderColor: 'var(--app-border)' }} />
 
-        <div className="row gy-3 align-items-center">
-          <div className="col-md-6">
+        <div className="row gy-3 align-items-center font-body small">
+          <div className="col-md-6 text-center text-md-start">
             <p className="mb-0 text-secondary">
-              © 2024 Skill Square. All rights reserved.
+              © {new Date().getFullYear()} Skill Square. All rights reserved.
             </p>
           </div>
-          <div className="col-md-6 text-md-end">
-            <NavLink to="/privacy" className="text-secondary text-decoration-none me-3">
+          <div className="col-md-6 text-center text-md-end">
+            <NavLink to="/privacy" className="text-secondary text-decoration-none me-3 hover-primary">
               Privacy Policy
             </NavLink>
-            <NavLink to="/terms" className="text-secondary text-decoration-none">
+            <NavLink to="/terms" className="text-secondary text-decoration-none hover-primary">
               Terms of Service
             </NavLink>
           </div>

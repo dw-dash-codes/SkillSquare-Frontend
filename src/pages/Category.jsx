@@ -28,19 +28,13 @@ const Category = () => {
   };
 
   return (
-    <section className="app-section app-section-hero category-page">
+    <section className="app-section bg-light min-vh-100" style={{ paddingTop: '120px' }}>
       <div className="container">
         <div className="text-center mb-5">
-          <span className="badge rounded-pill text-bg-light border px-3 py-2 mb-3">
+          <h1 className="font-display fw-bold text-dark mb-3">
             Service Directory
-          </span>
-
-          <h1 className="app-section-title mb-3">
-            <i className="fas fa-th-large me-3"></i>
-            Service Categories
           </h1>
-
-          <p className="text-secondary mb-0 category-page-subtitle mx-auto">
+          <p className="text-secondary font-body mb-0 mx-auto" style={{ maxWidth: '600px' }}>
             Discover all available service categories in your neighborhood and
             quickly connect with the right professional.
           </p>
@@ -51,14 +45,14 @@ const Category = () => {
             <div className="col-12">
               <div className="text-center py-5">
                 <div className="spinner-border text-primary mb-3" role="status"></div>
-                <p className="mb-0 text-secondary">Loading categories...</p>
+                <p className="mb-0 text-secondary font-body">Loading categories...</p>
               </div>
             </div>
           ) : categories.length === 0 ? (
             <div className="col-12">
-              <div className="card app-card border-0 text-center p-4 p-md-5">
-                <h4 className="fw-semibold mb-2">No categories found</h4>
-                <p className="text-secondary mb-0">
+              <div className="card app-card border-0 text-center p-4 p-md-5 rounded-4 shadow-sm">
+                <h4 className="font-display fw-bold mb-2">No categories found</h4>
+                <p className="text-secondary font-body mb-0">
                   There are no service categories available right now.
                 </p>
               </div>
@@ -69,34 +63,34 @@ const Category = () => {
                 key={cat.id}
                 className="col-xl-3 col-lg-4 col-md-6"
               >
-                <button
-                  type="button"
-                  className="category-grid-card card app-card border-0 text-center w-100"
+                <div
+                  className="card app-card category-card h-100 border-0 text-center rounded-4 shadow-sm"
+                  role="button"
                   onClick={() => handleCategoryClick(cat.id)}
+                  style={{ transition: 'all 0.3s ease', cursor: 'pointer' }}
                 >
-                  <div className="card-body p-4 p-lg-5">
-                    <div className="app-icon-circle mx-auto mb-3">
-                      <i className={cat.iconClass || "fas fa-cog"}></i>
+                  <div className="card-body p-4 p-lg-5 d-flex flex-column align-items-center justify-content-center">
+                    <div className="app-icon-circle mx-auto mb-3" style={{ width: '70px', height: '70px', fontSize: '1.8rem', background: 'rgba(242, 122, 33, 0.1)', color: 'var(--app-primary)' }}>
+                      <i className={cat.iconClass || "fas fa-tools"}></i>
                     </div>
-                    <h3 className="h5 fw-semibold mb-0">{cat.title}</h3>
+                    <h5 className="font-body fw-bold mb-0 text-dark">{cat.title}</h5>
                   </div>
-                </button>
+                </div>
               </div>
             ))
           )}
         </div>
 
-        <div className="text-center mt-5">
-          <div className="card app-card border-0 category-help-card d-inline-block">
+        <div className="text-center mt-5 pt-4">
+          <div className="card app-card border-0 d-inline-block rounded-4 shadow-sm" style={{ maxWidth: '600px' }}>
             <div className="card-body p-4 p-md-5">
-              <h4 className="fw-semibold mb-3">
+              <h4 className="font-display fw-bold mb-3">
                 Can't find what you're looking for?
               </h4>
-              <p className="text-secondary mb-4">
-                Contact us and we’ll help you find the right professional for your
-                needs.
+              <p className="text-secondary font-body mb-4">
+                Contact us and we’ll help you find the right professional for your needs.
               </p>
-              <a href="#contact" className="btn btn-primary rounded-pill px-4 py-2">
+              <a href="#contact" className="btn btn-outline-dark rounded-pill px-5 py-2 font-body fw-bold">
                 <i className="fas fa-envelope me-2"></i>
                 Contact Us
               </a>

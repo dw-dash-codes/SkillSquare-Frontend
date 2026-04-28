@@ -111,7 +111,11 @@ const ReviewModal = ({ isOpen, onClose, bookingId, onSuccess }) => {
 
   return (
     <>
-      <div className="review-modal-backdrop" onClick={onClose}></div>
+      <div 
+        className="review-modal-backdrop" 
+        onClick={onClose}
+        style={{ backgroundColor: 'rgba(15, 23, 42, 0.6)', backdropFilter: 'blur(4px)' }}
+      ></div>
 
       <div
         className="modal d-block review-modal-wrapper"
@@ -119,76 +123,95 @@ const ReviewModal = ({ isOpen, onClose, bookingId, onSuccess }) => {
         role="dialog"
         aria-modal="true"
       >
-        <div className="modal-dialog modal-dialog-centered">
-          <div className="modal-content border-0 review-modal-card">
-            <div className="modal-header review-modal-header border-0">
-              <h5 className="modal-title fw-bold">
-                <i className="fas fa-star me-2 text-warning"></i>
-                Rate Your Experience
-              </h5>
+        <div className="modal-dialog modal-dialog-centered" style={{ maxWidth: '500px' }}>
+          <div className="modal-content border-0 rounded-4 shadow-lg overflow-hidden bg-white">
+            
+            {/* Header */}
+            <div className="modal-header border-bottom-0 pt-4 px-4 pb-0 align-items-center">
+              <h4 className="modal-title font-display fw-bold text-dark d-flex align-items-center">
+                <div 
+                  className="rounded-circle d-flex align-items-center justify-content-center me-3"
+                  style={{ width: '45px', height: '45px', background: 'rgba(242, 122, 33, 0.1)', color: 'var(--app-primary)' }}
+                >
+                  <i className="fas fa-star"></i>
+                </div>
+                Rate Experience
+              </h4>
               <button
                 type="button"
-                className="btn-close btn-close-white"
+                className="btn-close shadow-none"
                 onClick={onClose}
                 aria-label="Close"
               ></button>
             </div>
 
-            <div className="modal-body p-4 text-center">
+            {/* Body */}
+            <div className="modal-body p-4 font-body">
               {fetchingDetails ? (
-                <div className="spinner-border text-primary my-3" role="status">
-                  <span className="visually-hidden">Loading...</span>
+                <div className="text-center py-4">
+                  <div className="spinner-border text-primary mb-2" role="status"></div>
+                  <p className="text-secondary small mb-0">Loading details...</p>
                 </div>
               ) : bookingInfo ? (
-                <div className="review-booking-info text-start mb-4">
-                  <h6 className="fw-bold mb-1 text-primary">
+                <div className="bg-light p-3 rounded-4 border-0 mb-4">
+                  <h6 className="fw-bold mb-2 text-dark font-display">
                     {bookingInfo.serviceCategory} Service
                   </h6>
-                  <p className="mb-1 small">
-                    <strong>Provider:</strong> {bookingInfo.providerName}
+                  <p className="mb-1 small text-secondary">
+                    <strong className="text-dark">Provider:</strong> {bookingInfo.providerName}
                   </p>
                   <p className="mb-1 small text-secondary">
-                    <strong>Task:</strong> {bookingInfo.taskDescription}
+                    <strong className="text-dark">Task:</strong> {bookingInfo.taskDescription}
                   </p>
                   <p className="mb-0 small text-secondary">
-                    <i className="far fa-calendar-alt me-1"></i>
+                    <i className="far fa-calendar-alt me-2"></i>
                     {bookingInfo.date}
                   </p>
                 </div>
               ) : (
-                <p className="text-danger small">Could not load booking details.</p>
+                <div className="alert alert-danger small rounded-3 border-0 py-2">
+                  Could not load booking details.
+                </div>
               )}
 
-              <h5 className="mb-3 text-dark fw-bold">How did they do?</h5>
+              <div className="text-center mb-4">
+                <h5 className="mb-3 text-dark font-display fw-bold">How did they do?</h5>
+                <div className="d-flex justify-content-center gap-2">
+                  {[...Array(5)].map((_, index) => {
+                    const ratingValue = index + 1;
+                    const active = ratingValue <= (hover || rating);
 
-              <div className="review-stars-wrap mb-4">
-                {[...Array(5)].map((_, index) => {
-                  const ratingValue = index + 1;
-                  const active = ratingValue <= (hover || rating);
-
-                  return (
-                    <button
-                      key={ratingValue}
-                      type="button"
-                      className={`review-star-btn ${active ? "active" : ""}`}
-                      onClick={() => setRating(ratingValue)}
-                      onMouseEnter={() => setHover(ratingValue)}
-                      onMouseLeave={() => setHover(rating)}
-                      aria-label={`Rate ${ratingValue} star${ratingValue > 1 ? "s" : ""}`}
-                    >
-                      ★
-                    </button>
-                  );
-                })}
+                    return (
+                      <button
+                        key={ratingValue}
+                        type="button"
+                        className="btn p-0 border-0 bg-transparent"
+                        onClick={() => setRating(ratingValue)}
+                        onMouseEnter={() => setHover(ratingValue)}
+                        onMouseLeave={() => setHover(rating)}
+                        style={{
+                          fontSize: '2.5rem',
+                          lineHeight: '1',
+                          color: active ? 'var(--app-primary)' : '#e2e8f0',
+                          transition: 'all 0.2s ease',
+                          transform: active ? 'scale(1.1)' : 'scale(1)'
+                        }}
+                      >
+                        ★
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
 
               <div className="text-start">
-                <label className="form-label auth-label">
+                <label className="form-label fw-bold text-dark small mb-2">
                   Write a Review (Optional)
                 </label>
                 <textarea
-                  className="form-control auth-input auth-textarea review-comment-box"
+                  className="form-control px-3 py-3 bg-light border-0 shadow-none"
                   rows="3"
+                  style={{ borderRadius: '0.75rem', resize: 'none' }}
                   placeholder="Tell us what you liked about the service..."
                   value={comment}
                   onChange={(e) => setComment(e.target.value)}
@@ -196,35 +219,37 @@ const ReviewModal = ({ isOpen, onClose, bookingId, onSuccess }) => {
               </div>
             </div>
 
-            <div className="modal-footer review-modal-footer border-0">
+            {/* Footer */}
+            <div className="modal-footer border-top-0 px-4 pb-4 pt-0 justify-content-between font-body">
               <button
-                className="btn btn-outline-secondary rounded-pill px-4"
+                className="btn btn-light rounded-pill px-4 fw-bold flex-grow-1 text-dark"
+                style={{ border: '1px solid var(--app-border)' }}
                 onClick={onClose}
                 disabled={loading}
               >
                 Cancel
               </button>
               <button
-                className="btn btn-primary rounded-pill px-4 fw-semibold"
+                className="btn btn-gradient-warm rounded-pill px-4 fw-bold flex-grow-1 shadow-warm"
                 onClick={handleSubmit}
                 disabled={loading || fetchingDetails}
               >
                 {loading ? (
                   <>
-                    <i className="fas fa-spinner fa-spin me-2"></i>
-                    Submitting...
+                    <i className="fas fa-spinner fa-spin me-2"></i> Submitting...
                   </>
                 ) : (
                   "Submit Review"
                 )}
               </button>
             </div>
+
           </div>
         </div>
       </div>
 
       {modalConfig.isOpen && (
-        <div className="review-alert-layer">
+        <div className="review-alert-layer" style={{ zIndex: 1060 }}>
           <ModalAlert
             type={modalConfig.type}
             title={modalConfig.title}

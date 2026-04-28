@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, Link } from "react-router-dom";
 import api from "../services/api";
 
 const ProviderDetails = () => {
@@ -45,12 +45,19 @@ const ProviderDetails = () => {
 
   const categoryName = category.find((c) => c.id === provider?.categoryId)?.title;
 
+  const getInitials = (firstName, lastName) => {
+    if (!firstName && !lastName) return "P";
+    const f = firstName ? firstName[0] : "";
+    const l = lastName ? lastName[0] : "";
+    return (f + l).toUpperCase() || "P";
+  };
+
   if (loading) {
     return (
-      <section className="app-section app-section-hero provider-details-page">
-        <div className="container text-center py-5">
-          <div className="spinner-border text-primary mb-3" role="status"></div>
-          <p className="mb-0 text-secondary">Loading provider details...</p>
+      <section className="app-section bg-light min-vh-100 d-flex align-items-center justify-content-center" style={{ paddingTop: '120px' }}>
+        <div className="text-center py-5">
+          <div className="spinner-border text-primary mb-3" style={{ width: '3rem', height: '3rem' }} role="status"></div>
+          <p className="mb-0 text-secondary font-body">Loading provider details...</p>
         </div>
       </section>
     );
@@ -58,13 +65,19 @@ const ProviderDetails = () => {
 
   if (!provider) {
     return (
-      <section className="app-section app-section-hero provider-details-page">
+      <section className="app-section bg-light min-vh-100" style={{ paddingTop: '120px' }}>
         <div className="container">
-          <div className="card app-card border-0 text-center p-4 p-md-5">
-            <h4 className="fw-semibold mb-2">Provider not found</h4>
-            <p className="text-secondary mb-0">
+          <div className="card app-card border-0 text-center p-5 rounded-4 shadow-sm" style={{ maxWidth: '600px', margin: '0 auto' }}>
+            <div className="mb-4" style={{ fontSize: '3rem', color: 'var(--app-primary)', opacity: '0.5' }}>
+              <i className="fas fa-user-times"></i>
+            </div>
+            <h4 className="font-display fw-bold mb-2">Provider not found</h4>
+            <p className="text-secondary font-body mb-0">
               We couldn’t load this provider’s details at the moment.
             </p>
+            <button onClick={() => navigate(-1)} className="btn btn-outline-dark rounded-pill px-4 mt-4 font-body fw-bold">
+              Go Back
+            </button>
           </div>
         </div>
       </section>
@@ -72,125 +85,140 @@ const ProviderDetails = () => {
   }
 
   return (
-    <section className="app-section app-section-hero provider-details-page">
+    <section className="app-section bg-light min-vh-100" style={{ paddingTop: '110px', paddingBottom: '80px' }}>
       <div className="container">
+        
+        {/* Back Navigation */}
+        <div className="mb-4">
+          <button onClick={() => navigate(-1)} className="btn btn-link text-decoration-none text-secondary font-body small p-0 hover-primary">
+            <i className="fas fa-arrow-left me-2"></i> Back to Providers
+          </button>
+        </div>
+
         <div className="row g-4">
+          {/* Main Content Column */}
           <div className="col-lg-8">
-            <div className="card app-card border-0 provider-hero-card mb-4">
+            
+            {/* Hero Profile Card */}
+            <div className="card app-card border-0 rounded-4 shadow-sm mb-4 bg-white">
               <div className="card-body p-4 p-lg-5">
-                <div className="row align-items-center g-4">
-                  <div className="col-md-3 text-center text-md-start">
-                    <div className="provider-profile-avatar mx-auto mx-md-0">
-                      <i className="fas fa-bolt"></i>
-                    </div>
+                <div className="d-flex flex-column flex-md-row align-items-center align-items-md-start gap-4">
+                  {/* Avatar */}
+                  <div 
+                    className="flex-shrink-0 rounded-circle d-flex align-items-center justify-content-center text-white font-display fw-bold shadow-sm" 
+                    style={{ width: '100px', height: '100px', fontSize: '2.5rem', background: 'var(--gradient-warm)' }}
+                  >
+                    {getInitials(provider.firstName, provider.lastName)}
                   </div>
 
-                  <div className="col-md-9 text-center text-md-start">
-                    <h1 className="mb-2 fw-bold">
+                  {/* Info */}
+                  <div className="text-center text-md-start flex-grow-1">
+                    <h1 className="font-display fw-bold text-dark mb-1">
                       {provider.firstName} {provider.lastName}
                     </h1>
-
-                    <p className="text-secondary mb-3">
+                    <p className="text-secondary font-body mb-3 fs-5">
                       {categoryName || "Service Provider"}
                     </p>
 
-                    <div className="d-flex flex-wrap gap-3 justify-content-center justify-content-md-start align-items-center">
-                      <div className="provider-rating-wrap">
-                        {[...Array(5)].map((_, i) => (
-                          <i
-                            key={i}
-                            className={`me-1 ${
-                              i < Math.round(rating.averageRating)
-                                ? "fas fa-star text-warning"
-                                : "far fa-star text-muted"
-                            }`}
-                          ></i>
-                        ))}
-                        <span className="ms-2 fw-semibold text-dark">
-                          {rating.averageRating.toFixed(1)}
-                        </span>
+                    <div className="d-flex flex-wrap gap-3 justify-content-center justify-content-md-start align-items-center font-body">
+                      {/* Rating */}
+                      <div className="d-flex align-items-center px-3 py-2 rounded-pill" style={{ background: 'var(--app-surface-muted)', border: '1px solid var(--app-border)' }}>
+                        <i className="fas fa-star me-2" style={{ color: 'var(--app-primary)' }}></i>
+                        <span className="fw-bold text-dark me-1">{rating.averageRating.toFixed(1)}</span>
+                        <span className="text-secondary small">({rating.totalReviews} reviews)</span>
                       </div>
 
-                      <span className="badge rounded-pill text-bg-light border px-3 py-2">
-                        {rating.totalReviews} Reviews
-                      </span>
-
-                      <span className="badge rounded-pill text-bg-light border px-3 py-2">
-                        ${provider.hourlyRate}/hour
-                      </span>
+                      {/* Rate */}
+                      {provider.hourlyRate > 0 && (
+                        <div className="d-flex align-items-center px-3 py-2 rounded-pill fw-bold text-dark" style={{ background: 'var(--app-surface-muted)', border: '1px solid var(--app-border)' }}>
+                          <i className="fas fa-clock me-2" style={{ color: 'var(--app-primary)' }}></i>
+                          ${provider.hourlyRate}/hr
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
               </div>
             </div>
 
-            <div className="card app-card border-0 mb-4">
+            {/* About Card */}
+            <div className="card app-card border-0 rounded-4 shadow-sm mb-4 bg-white">
               <div className="card-body p-4 p-lg-5">
-                <h2 className="h4 fw-semibold mb-3">
-                  <i className="fas fa-user me-2 text-primary"></i>
-                  About {provider.firstName}
-                </h2>
-
-                <p className="text-secondary mb-3">
-                  {provider.bio || "No bio available."}
+                <h3 className="font-display fw-bold text-dark mb-4 border-bottom pb-3">
+                  About
+                </h3>
+                <p className="text-secondary font-body mb-4" style={{ lineHeight: '1.7', fontSize: '1.05rem' }}>
+                  {provider.bio || "No bio available for this provider yet."}
                 </p>
 
-                <div className="provider-skills-box">
-                  <h6 className="fw-semibold mb-2">Skills</h6>
-                  <p className="text-secondary mb-0">
-                    {provider.skills || "No skills listed."}
-                  </p>
-                </div>
+                {provider.skills && (
+                  <div>
+                    <h6 className="font-display fw-bold text-dark mb-3">Expertise & Skills</h6>
+                    <div className="d-flex flex-wrap gap-2">
+                      {/* Splitting skills by comma if it's a string, or just displaying it */}
+                      {provider.skills.split(',').map((skill, index) => (
+                        <span key={index} className="badge rounded-pill text-dark font-body fw-medium px-3 py-2" style={{ background: 'var(--app-surface-muted)', border: '1px solid var(--app-border)', fontSize: '0.9rem' }}>
+                          {skill.trim()}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 
-            <div className="card app-card border-0">
+            {/* Reviews Card */}
+            <div className="card app-card border-0 rounded-4 shadow-sm bg-white">
               <div className="card-body p-4 p-lg-5">
-                <h2 className="h4 fw-semibold mb-4">
-                  <i className="fas fa-star me-2 text-primary"></i>
-                  Customer Reviews
-                </h2>
+                <div className="d-flex align-items-center justify-content-between mb-4 border-bottom pb-3">
+                  <h3 className="font-display fw-bold text-dark mb-0">
+                    Reviews <span className="text-secondary fs-5">({reviews.length})</span>
+                  </h3>
+                </div>
 
                 {reviews.length === 0 ? (
-                  <div className="text-center py-4">
-                    <div className="search-empty-icon mb-3">
+                  <div className="text-center py-5">
+                    <div className="mb-3" style={{ fontSize: '2.5rem', color: 'var(--app-primary)', opacity: '0.5' }}>
                       <i className="fas fa-comment-slash"></i>
                     </div>
-                    <p className="text-secondary mb-0">No reviews yet.</p>
+                    <p className="text-secondary font-body mb-0">No reviews yet for this provider.</p>
                   </div>
                 ) : (
-                  <div className="d-flex flex-column gap-3">
+                  <div className="d-flex flex-column gap-4">
                     {reviews.map((review) => (
-                      <div key={review.id} className="provider-review-item">
+                      <div key={review.id} className="p-4 rounded-4" style={{ border: '1px solid var(--app-border)', background: 'var(--app-surface)' }}>
                         <div className="d-flex align-items-start gap-3">
-                          <div className="provider-review-avatar">
-                            <i className="fas fa-user"></i>
+                          {/* Reviewer Avatar */}
+                          <div 
+                            className="flex-shrink-0 rounded-circle d-flex align-items-center justify-content-center text-primary font-body fw-bold" 
+                            style={{ width: '48px', height: '48px', background: 'rgba(242, 122, 33, 0.1)', fontSize: '1.1rem' }}
+                          >
+                            {getInitials(review.customerName, "")}
                           </div>
 
                           <div className="flex-grow-1">
-                            <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-start gap-2 mb-2">
-                              <div>
-                                <h6 className="mb-1 fw-semibold">
-                                  {review.customerName}
-                                </h6>
-                                <div className="text-warning small">
-                                  {Array.from({ length: 5 }, (_, i) => (
-                                    <i
-                                      key={i}
-                                      className={`me-1 ${
-                                        i < review.rating ? "fas fa-star" : "far fa-star text-muted"
-                                      }`}
-                                    ></i>
-                                  ))}
-                                </div>
-                              </div>
-
-                              <span className="text-secondary small">
-                                {new Date(review.createdAt).toLocaleDateString()}
+                            <div className="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center mb-2">
+                              <h6 className="font-display fw-bold text-dark mb-1 mb-sm-0">
+                                {review.customerName || "Customer"}
+                              </h6>
+                              <span className="text-secondary font-body small">
+                                {new Date(review.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
                               </span>
                             </div>
 
-                            <p className="text-secondary mb-0">
+                            <div className="mb-2">
+                              {Array.from({ length: 5 }, (_, i) => (
+                                <i
+                                  key={i}
+                                  className={`me-1 ${
+                                    i < review.rating ? "fas fa-star" : "far fa-star"
+                                  }`}
+                                  style={{ color: i < review.rating ? 'var(--app-primary)' : '#e4e5e9', fontSize: '0.9rem' }}
+                                ></i>
+                              ))}
+                            </div>
+
+                            <p className="text-secondary font-body mb-0" style={{ lineHeight: '1.6' }}>
                               {review.comment}
                             </p>
                           </div>
@@ -203,67 +231,58 @@ const ProviderDetails = () => {
             </div>
           </div>
 
+          {/* Sidebar / Booking Column */}
           <div className="col-lg-4">
-            <div className="card app-card border-0 provider-booking-card sticky-lg-top">
-              <div className="card-body p-4">
-                <h3 className="h5 fw-semibold mb-4">
-                  <i className="fas fa-calendar-check me-2 text-primary"></i>
+            <div className="card app-card border-0 rounded-4 shadow-sm bg-white" style={{ position: 'sticky', top: '100px' }}>
+              <div className="card-body p-4 p-lg-5">
+                <h4 className="font-display fw-bold text-dark mb-4 text-center">
                   Book {provider.firstName}
-                </h3>
+                </h4>
 
                 <button
-                  className="btn btn-primary w-100 rounded-pill py-3 fw-semibold mb-4"
+                  className="btn btn-gradient-warm w-100 rounded-pill py-3 font-body fw-bold mb-4 shadow-warm"
                   onClick={handleBooking}
                 >
-                  <i className="fas fa-calendar-plus me-2"></i>
+                  <i className="fas fa-calendar-alt me-2"></i>
                   Book Appointment
                 </button>
 
-                <div className="provider-contact-list d-flex flex-column gap-3">
-                  <div className="provider-contact-item">
-                    <div className="provider-contact-icon">
+                <hr style={{ borderColor: 'var(--app-border)' }} />
+
+                <div className="d-flex flex-column gap-4 mt-4 font-body">
+                  <div className="d-flex align-items-center gap-3">
+                    <div className="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style={{ width: '45px', height: '45px', background: 'rgba(242, 122, 33, 0.1)', color: 'var(--app-primary)' }}>
                       <i className="fas fa-phone"></i>
                     </div>
                     <div>
-                      <div className="fw-semibold">Phone</div>
-                      <div className="text-secondary">{provider.phoneNumber || "N/A"}</div>
+                      <p className="text-secondary small mb-0 fw-medium">Phone</p>
+                      <p className="text-dark fw-bold mb-0">{provider.phoneNumber || "Not provided"}</p>
                     </div>
                   </div>
 
-                  <div className="provider-contact-item">
-                    <div className="provider-contact-icon">
+                  <div className="d-flex align-items-center gap-3">
+                    <div className="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style={{ width: '45px', height: '45px', background: 'rgba(242, 122, 33, 0.1)', color: 'var(--app-primary)' }}>
                       <i className="fas fa-envelope"></i>
                     </div>
-                    <div>
-                      <div className="fw-semibold">Email</div>
-                      <div className="text-secondary">{provider.email || "N/A"}</div>
+                    <div style={{ wordBreak: 'break-word' }}>
+                      <p className="text-secondary small mb-0 fw-medium">Email</p>
+                      <p className="text-dark fw-bold mb-0">{provider.email || "Not provided"}</p>
                     </div>
                   </div>
 
-                  <div className="provider-contact-item">
-                    <div className="provider-contact-icon">
+                  <div className="d-flex align-items-center gap-3">
+                    <div className="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style={{ width: '45px', height: '45px', background: 'rgba(242, 122, 33, 0.1)', color: 'var(--app-primary)' }}>
                       <i className="fas fa-map-marker-alt"></i>
                     </div>
                     <div>
-                      <div className="fw-semibold">Service Area</div>
-                      <div className="text-secondary">
-                        {[provider.area, provider.address].filter(Boolean).join(", ") || "N/A"}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="provider-contact-item">
-                    <div className="provider-contact-icon">
-                      <i className="fas fa-dollar-sign"></i>
-                    </div>
-                    <div>
-                      <div className="fw-semibold">Starting Rate</div>
-                      <div className="text-secondary">
-                        {provider.hourlyRate ? `$${provider.hourlyRate}/hour` : "N/A"}
-                      </div>
+                      <p className="text-secondary small mb-0 fw-medium">Service Area</p>
+                      <p className="text-dark fw-bold mb-0">
+                        {[provider.area, provider.city].filter(Boolean).join(", ") || "Location not set"}
+                      </p>
                     </div>
                   </div>
                 </div>
+
               </div>
             </div>
           </div>

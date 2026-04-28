@@ -93,13 +93,26 @@ const GetAllUsers = () => {
     }
   };
 
-  const getStatusBadgeClass = (isActive) =>
-    isActive ? "booking-status-confirmed" : "booking-status-cancelled";
+  const getInitials = (name) => {
+    if (!name) return "U";
+    return name.split(" ").map(n => n[0]).join("").toUpperCase().substring(0, 2);
+  };
 
   if (loading) {
     return (
-      <>
-        {modalConfig.isOpen && (
+      <section className="admin-page bg-light min-vh-100 d-flex align-items-center justify-content-center" style={{ margin: '-2rem', padding: '2rem' }}>
+        <div className="card app-card border rounded-4 text-center p-5 shadow-sm bg-white" style={{ borderColor: 'var(--app-border)' }}>
+          <div className="spinner-border text-primary mb-3" style={{ width: '3rem', height: '3rem' }} role="status"></div>
+          <p className="mb-0 text-secondary font-body">Loading users...</p>
+        </div>
+      </section>
+    );
+  }
+
+  return (
+    <>
+      {modalConfig.isOpen && (
+        <div className="review-alert-layer" style={{ zIndex: 1060 }}>
           <ModalAlert
             type={modalConfig.type}
             title={modalConfig.title}
@@ -107,147 +120,129 @@ const GetAllUsers = () => {
             actions={modalConfig.actions}
             onClose={closeModal}
           />
-        )}
-
-        <section className="admin-page">
-          <div className="card app-card border-0 text-center p-4 p-md-5">
-            <div className="spinner-border text-primary mb-3" role="status"></div>
-            <p className="mb-0 text-secondary">Loading users...</p>
-          </div>
-        </section>
-      </>
-    );
-  }
-
-  return (
-    <>
-      {modalConfig.isOpen && (
-        <ModalAlert
-          type={modalConfig.type}
-          title={modalConfig.title}
-          message={modalConfig.message}
-          actions={modalConfig.actions}
-          onClose={closeModal}
-        />
+        </div>
       )}
 
       {confirmConfig.isOpen && (
-        <ModalAlert
-          type="info"
-          title="Confirm Action"
-          message={`Are you sure you want to ${confirmConfig.actionLabel} this user?`}
-          actions={[
-            { label: "Proceed", onClick: confirmStatusChange },
-            { label: "Cancel", onClick: closeConfirm },
-          ]}
-          onClose={closeConfirm}
-        />
+        <div className="review-alert-layer" style={{ zIndex: 1060 }}>
+          <ModalAlert
+            type="info"
+            title="Confirm Action"
+            message={`Are you sure you want to ${confirmConfig.actionLabel} this user?`}
+            actions={[
+              { label: "Proceed", onClick: confirmStatusChange },
+              { label: "Cancel", onClick: closeConfirm },
+            ]}
+            onClose={closeConfirm}
+          />
+        </div>
       )}
 
-      <section className="admin-page">
-        <div className="admin-page-header mb-4">
-          <div>
-            <span className="badge rounded-pill text-bg-light border px-3 py-2 mb-2">
-              Admin Panel
-            </span>
-            <h1 className="admin-page-title mb-2">Manage Users</h1>
-            <p className="text-secondary mb-0">
-              Review customer accounts and manage their active status.
-            </p>
-          </div>
+      <section className="admin-page bg-light min-vh-100" style={{ margin: '-2rem', padding: '2rem' }}>
+        
+        {/* Page Header */}
+        <div className="mb-5">
+          <span className="badge rounded-pill px-3 py-1 mb-3 fw-bold font-body text-uppercase" style={{ background: 'rgba(13, 110, 253, 0.1)', color: 'var(--app-primary)', letterSpacing: '0.5px', fontSize: '0.75rem' }}>
+            User Management
+          </span>
+          <h1 className="font-display fw-bold text-dark display-6 mb-2">System Users</h1>
+          <p className="text-secondary font-body mb-0">
+            Review customer accounts and manage their active status.
+          </p>
         </div>
 
-        <div className="card app-card border-0 admin-table-card">
-          <div className="card-body p-0">
-            <div className="p-4 pb-3 border-bottom">
-              <h2 className="h5 fw-semibold mb-1">System Users (Customers)</h2>
-              <p className="text-secondary mb-0">
-                All registered customer accounts on the platform.
-              </p>
-            </div>
+        {/* Data Table Card */}
+        <div className="card app-card border rounded-4 shadow-sm bg-white overflow-hidden" style={{ borderColor: '#cbd5e1' }}>
+          <div className="card-header bg-white border-bottom p-4">
+            <h4 className="font-display fw-bold text-dark mb-1">Customer Accounts</h4>
+            <p className="text-secondary font-body mb-0 small">
+              All registered customer accounts on the platform.
+            </p>
+          </div>
 
+          <div className="card-body p-0">
             {users.length === 0 ? (
-              <div className="text-center p-4 p-md-5">
-                <div className="search-empty-icon mb-3">
+              <div className="text-center py-5">
+                <div className="mb-3" style={{ fontSize: '3rem', color: '#e2e8f0' }}>
                   <i className="fas fa-users-slash"></i>
                 </div>
-                <h5 className="fw-semibold mb-2">No customers found</h5>
-                <p className="text-secondary mb-0">
-                  Customer accounts will appear here once available.
-                </p>
+                <h5 className="font-display fw-bold text-dark mb-2">No customers found</h5>
+                <p className="text-secondary font-body mb-0">Customer accounts will appear here once available.</p>
               </div>
             ) : (
               <div className="table-responsive">
-                <table className="table align-middle mb-0 admin-data-table">
-                  <thead>
+                <table className="table table-hover align-middle mb-0 font-body">
+                  <thead style={{ background: '#f8fafc' }}>
                     <tr>
-                      <th>Avatar</th>
-                      <th>Name & Email</th>
-                      <th>Phone</th>
-                      <th>City</th>
-                      <th>Role</th>
-                      <th>Status</th>
-                      <th className="text-end">Actions</th>
+                      <th className="text-secondary fw-bold small text-uppercase px-4 py-3" style={{ letterSpacing: '0.5px', borderBottom: '1px solid #e2e8f0' }}>User</th>
+                      <th className="text-secondary fw-bold small text-uppercase px-4 py-3" style={{ letterSpacing: '0.5px', borderBottom: '1px solid #e2e8f0' }}>Contact Info</th>
+                      <th className="text-secondary fw-bold small text-uppercase px-4 py-3" style={{ letterSpacing: '0.5px', borderBottom: '1px solid #e2e8f0' }}>Role</th>
+                      <th className="text-secondary fw-bold small text-uppercase px-4 py-3" style={{ letterSpacing: '0.5px', borderBottom: '1px solid #e2e8f0' }}>Status</th>
+                      <th className="text-secondary fw-bold small text-uppercase px-4 py-3 text-end" style={{ letterSpacing: '0.5px', borderBottom: '1px solid #e2e8f0' }}>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
                     {users.map((user) => (
-                      <tr key={user.id}>
-                        <td>
-                          <div className="admin-provider-avatar">
-                            {user.fullName?.charAt(0).toUpperCase()}
+                      <tr key={user.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
+                        
+                        <td className="px-4 py-3">
+                          <div className="d-flex align-items-center gap-3">
+                            <div 
+                              className="rounded-circle d-flex align-items-center justify-content-center fw-bold shadow-sm" 
+                              style={{ width: '45px', height: '45px', background: 'rgba(13, 110, 253, 0.1)', color: 'var(--app-primary)', fontSize: '1rem' }}
+                            >
+                              {getInitials(user.fullName)}
+                            </div>
+                            <div>
+                              <div className="fw-bold text-dark mb-0">{user.fullName}</div>
+                              <div className="text-secondary small">{user.city || "No City"}</div>
+                            </div>
                           </div>
                         </td>
 
-                        <td>
-                          <div className="fw-semibold">{user.fullName}</div>
-                          <div className="text-secondary small">{user.email}</div>
+                        <td className="px-4 py-3">
+                          <div className="text-dark fw-medium mb-0">{user.email}</div>
+                          <div className="text-secondary small">{user.phoneNumber || "No Phone"}</div>
                         </td>
 
-                        <td>{user.phoneNumber || "N/A"}</td>
-                        <td>{user.city || "N/A"}</td>
-
-                        <td>
-                          <span className="badge rounded-pill text-bg-light border px-3 py-2">
+                        <td className="px-4 py-3">
+                          <span className="badge rounded-pill bg-light text-dark border px-3 py-1 fw-medium shadow-sm">
                             Customer
                           </span>
                         </td>
 
-                        <td>
-                          <span
-                            className={`booking-status-badge ${getStatusBadgeClass(
-                              user.isActive
-                            )}`}
-                          >
-                            {user.isActive ? "Active" : "Blocked"}
-                          </span>
+                        <td className="px-4 py-3">
+                          {user.isActive ? (
+                            <span className="badge rounded-pill bg-success-subtle text-success border border-success-subtle px-3 py-1 fw-bold">
+                              <i className="fas fa-check-circle me-1"></i> Active
+                            </span>
+                          ) : (
+                            <span className="badge rounded-pill bg-danger-subtle text-danger border border-danger-subtle px-3 py-1 fw-bold">
+                              <i className="fas fa-ban me-1"></i> Blocked
+                            </span>
+                          )}
                         </td>
 
-                        <td className="text-end">
+                        <td className="px-4 py-3 text-end">
                           {user.isActive ? (
                             <button
-                              onClick={() =>
-                                handleStatusChange(user.id, user.isActive)
-                              }
-                              className="btn btn-sm btn-outline-danger rounded-pill px-3"
+                              onClick={() => handleStatusChange(user.id, user.isActive)}
+                              className="btn btn-sm btn-outline-danger rounded-pill px-4 fw-bold"
                               title="Block User"
                             >
-                              <i className="fas fa-ban me-1"></i>
                               Block
                             </button>
                           ) : (
                             <button
-                              onClick={() =>
-                                handleStatusChange(user.id, user.isActive)
-                              }
-                              className="btn btn-sm btn-success rounded-pill px-3"
+                              onClick={() => handleStatusChange(user.id, user.isActive)}
+                              className="btn btn-sm btn-success rounded-pill px-4 fw-bold shadow-sm"
                               title="Unblock User"
                             >
-                              <i className="fas fa-unlock me-1"></i>
                               Unblock
                             </button>
                           )}
                         </td>
+
                       </tr>
                     ))}
                   </tbody>
@@ -256,6 +251,7 @@ const GetAllUsers = () => {
             )}
           </div>
         </div>
+
       </section>
     </>
   );

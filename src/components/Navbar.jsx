@@ -14,10 +14,22 @@ const Navbar = () => {
   const [notifications, setNotifications] = useState([]);
   const [hasUnreadNotifications, setHasUnreadNotifications] = useState(false);
   const [showProviderNotifPrompt, setShowProviderNotifPrompt] = useState(false);
+  
+  // New state for Search Bar
+  const [searchQuery, setSearchQuery] = useState("");
 
   const handleLogout = () => {
     logoutUser();
     navigate("/");
+  };
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      // Routing to your existing categories/services page with search param
+      navigate(`/categories?search=${encodeURIComponent(searchQuery.trim())}`);
+      setSearchQuery("");
+    }
   };
 
   useEffect(() => {
@@ -171,7 +183,7 @@ const Navbar = () => {
       <div className="app-notification-menu-footer">
         <button
           type="button"
-          className="btn btn-primary btn-sm rounded-pill px-3"
+          className="btn btn-gradient-warm btn-sm rounded-pill px-3"
           onClick={handleSeeAllNotifications}
         >
           See all notifications
@@ -181,19 +193,38 @@ const Navbar = () => {
   );
 
   const navLinkClass = ({ isActive }) =>
-    `nav-link app-nav-link ${isActive ? "active" : ""}`;
+    `nav-link app-nav-link font-body ${isActive ? "active" : ""}`;
 
   return (
     <>
       <nav className="navbar navbar-expand-lg fixed-top app-navbar">
         <div className="container">
-          <NavLink className="navbar-brand d-flex align-items-center" to="/">
-            <img
-              src="nav_logo.png"
-              alt="Skill Square"
-              className="img-fluid app-navbar-logo"
+          
+          {/* Lovable Style Text Logo */}
+          <NavLink to="/" className="navbar-brand d-flex align-items-center">
+            <img 
+              src="hero_logo_1.png" 
+              alt="SkillSquare" 
+              style={{ height: '40px', width: 'auto', objectFit: 'cover' }} 
             />
           </NavLink>
+
+          {/* Desktop Search Bar (Centered) */}
+          <form onSubmit={handleSearch} className="d-none d-lg-flex mx-auto px-4" style={{ maxWidth: '450px', width: '100%' }}>
+            <div className="input-group border" style={{ background: 'var(--app-surface-muted)', borderRadius: '999px', overflow: 'hidden' }}>
+              <span className="input-group-text bg-transparent border-0 pe-2">
+                <i className="fas fa-search text-muted"></i>
+              </span>
+              <input
+                type="text"
+                className="form-control bg-transparent border-0 shadow-none font-body"
+                placeholder="Search services or providers..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                style={{ fontSize: '0.9rem' }}
+              />
+            </div>
+          </form>
 
           <button
             className="navbar-toggler border-0 shadow-none"
@@ -208,6 +239,24 @@ const Navbar = () => {
           </button>
 
           <div className="collapse navbar-collapse" id="navbarNav">
+            
+            {/* Mobile Search Bar */}
+            <form onSubmit={handleSearch} className="d-block d-lg-none my-3">
+              <div className="input-group" style={{ background: 'var(--app-surface-muted)', borderRadius: '999px', overflow: 'hidden' }}>
+                <span className="input-group-text bg-transparent border-0 pe-2">
+                  <i className="fas fa-search text-muted"></i>
+                </span>
+                <input
+                  type="text"
+                  className="form-control bg-transparent border-0 shadow-none font-body"
+                  placeholder="Search services..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  style={{ fontSize: '0.9rem' }}
+                />
+              </div>
+            </form>
+
             <ul className="navbar-nav ms-auto align-items-lg-center gap-lg-2">
               {role === "Admin" && (
                 <>
@@ -220,7 +269,7 @@ const Navbar = () => {
                   <li className="nav-item">
                     <button
                       onClick={handleLogout}
-                      className="btn btn-outline-danger rounded-pill px-4 ms-lg-2"
+                      className="btn btn-outline-danger rounded-pill px-4 ms-lg-2 font-body fw-medium"
                     >
                       <i className="fas fa-sign-out-alt me-2"></i>
                       Logout
@@ -233,18 +282,16 @@ const Navbar = () => {
                 <>
                   <li className="nav-item">
                     <NavLink to="/provider" className={navLinkClass}>
-                      <i className="fas fa-tachometer-alt me-2"></i>
                       Dashboard
                     </NavLink>
                   </li>
-
                   <li className="nav-item">
                     <NavLink to="/provider/profile" className={navLinkClass}>
-                      <i className="fas fa-user-circle me-2"></i>
                       Profile
                     </NavLink>
                   </li>
 
+                  {/* Desktop Bell */}
                   <li className="nav-item app-notification-nav-item d-none d-lg-block">
                     <button
                       type="button"
@@ -261,6 +308,7 @@ const Navbar = () => {
                     <NotificationPreview />
                   </li>
 
+                  {/* Mobile Bell */}
                   <li className="nav-item d-lg-none">
                     <button
                       type="button"
@@ -273,15 +321,15 @@ const Navbar = () => {
                           <span className="app-notification-dot"></span>
                         )}
                       </span>
+                      <span className="ms-2 font-body">Notifications</span>
                     </button>
                   </li>
 
                   <li className="nav-item">
                     <button
                       onClick={handleLogout}
-                      className="btn btn-outline-danger rounded-pill px-4 ms-lg-2"
+                      className="btn btn-outline-danger rounded-pill px-4 ms-lg-2 font-body fw-medium"
                     >
-                      <i className="fas fa-sign-out-alt me-2"></i>
                       Logout
                     </button>
                   </li>
@@ -292,25 +340,21 @@ const Navbar = () => {
                 <>
                   <li className="nav-item">
                     <NavLink to="/categories" className={navLinkClass}>
-                      <i className="fas fa-tools me-2"></i>
-                      Services
+                      Browse
                     </NavLink>
                   </li>
-
                   <li className="nav-item">
                     <NavLink to="/my-bookings" className={navLinkClass}>
-                      <i className="fas fa-bookmark me-2"></i>
                       My Bookings
                     </NavLink>
                   </li>
-
                   <li className="nav-item">
                     <NavLink to="/user-profile" className={navLinkClass}>
-                      <i className="fas fa-user-circle me-2"></i>
                       Profile
                     </NavLink>
                   </li>
 
+                  {/* Desktop Bell */}
                   <li className="nav-item app-notification-nav-item d-none d-lg-block">
                     <NavLink to="/notifications" className={navLinkClass}>
                       <span className="app-notification-icon">
@@ -323,6 +367,7 @@ const Navbar = () => {
                     <NotificationPreview />
                   </li>
 
+                  {/* Mobile Bell */}
                   <li className="nav-item d-lg-none">
                     <NavLink to="/notifications" className={navLinkClass}>
                       <span className="app-notification-icon">
@@ -331,15 +376,15 @@ const Navbar = () => {
                           <span className="app-notification-dot"></span>
                         )}
                       </span>
+                      <span className="ms-2 font-body">Notifications</span>
                     </NavLink>
                   </li>
 
                   <li className="nav-item">
                     <button
                       onClick={handleLogout}
-                      className="btn btn-outline-danger rounded-pill px-4 ms-lg-2"
+                      className="btn btn-outline-danger rounded-pill px-4 ms-lg-2 font-body fw-medium"
                     >
-                      <i className="fas fa-sign-out-alt me-2"></i>
                       Logout
                     </button>
                   </li>
@@ -350,24 +395,19 @@ const Navbar = () => {
                 <>
                   <li className="nav-item">
                     <NavLink to="/categories" className={navLinkClass}>
-                      <i className="fas fa-tools me-2"></i>
                       Services
                     </NavLink>
                   </li>
-
                   <li className="nav-item">
                     <NavLink to="/login" className={navLinkClass}>
-                      <i className="fas fa-sign-in-alt me-2"></i>
-                      Login
+                      Sign In
                     </NavLink>
                   </li>
-
-                  <li className="nav-item">
+                  <li className="nav-item mt-2 mt-lg-0">
                     <NavLink
                       to="/getstarted"
-                      className="btn btn-primary rounded-pill px-4 ms-lg-2"
+                      className="btn btn-gradient-warm rounded-pill px-4 ms-lg-2 font-body fw-medium w-100"
                     >
-                      <i className="fas fa-rocket me-2"></i>
                       Get Started
                     </NavLink>
                   </li>

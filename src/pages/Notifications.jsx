@@ -124,36 +124,31 @@ const Notifications = ({ isProviderView = false }) => {
   };
 
   return (
-    <section className="app-section app-section-hero notifications-page">
+    <section className="app-section bg-light min-vh-100" style={{ paddingTop: '110px' }}>
       <div className="container">
         <div className="text-center mb-5">
-          <span className="badge rounded-pill text-bg-light border px-3 py-2 mb-3">
-            Alerts & Updates
-          </span>
-
-          <h1 className="app-section-title mb-3">
-            <i className="fas fa-bell me-3"></i>
+          <h1 className="font-display fw-bold text-dark mb-2">
+            <i className="fas fa-bell me-2" style={{ color: 'var(--app-primary)' }}></i>
             {isProviderView ? "Provider Notifications" : "Notifications"}
           </h1>
-
-          <p className="text-secondary mb-0 notifications-subtitle mx-auto">
+          <p className="text-secondary font-body mb-0 mx-auto" style={{ maxWidth: '600px' }}>
             Stay updated with your latest bookings, service activity, and review requests.
           </p>
         </div>
 
-        <div className="notifications-list-wrap mx-auto">
+        <div className="mx-auto" style={{ maxWidth: '750px' }}>
           {loading ? (
             <div className="text-center py-5">
               <div className="spinner-border text-primary mb-3" role="status"></div>
-              <p className="mb-0 text-secondary">Loading notifications...</p>
+              <p className="mb-0 text-secondary font-body">Loading notifications...</p>
             </div>
           ) : notifications.length === 0 ? (
-            <div className="card app-card border-0 text-center p-4 p-md-5 search-empty-card">
-              <div className="search-empty-icon mb-3">
+            <div className="card app-card border-0 text-center p-5 rounded-4 shadow-sm bg-white">
+              <div className="mb-4" style={{ fontSize: '3rem', color: 'var(--app-primary)', opacity: '0.5' }}>
                 <i className="far fa-bell-slash"></i>
               </div>
-              <h4 className="fw-semibold mb-2">No notifications yet</h4>
-              <p className="text-secondary mb-0">
+              <h4 className="font-display fw-bold mb-2">No notifications yet</h4>
+              <p className="text-secondary font-body mb-0">
                 New alerts and booking updates will appear here.
               </p>
             </div>
@@ -164,31 +159,44 @@ const Notifications = ({ isProviderView = false }) => {
                   key={notif.id}
                   type="button"
                   onClick={() => handleNotificationClick(notif)}
-                  className={`notification-item-card ${
-                    notif.isRead ? "is-read" : "is-unread"
-                  }`}
+                  className="card app-card border-0 w-100 text-start p-3 p-md-4 rounded-4 shadow-sm"
+                  style={{ 
+                    background: notif.isRead ? '#f8fafc' : '#ffffff', 
+                    borderLeft: notif.isRead ? 'none' : '4px solid var(--app-primary)',
+                    transition: 'all 0.3s ease'
+                  }}
                 >
-                  <div
-                    className={`notification-item-status ${
-                      notif.isRead ? "read" : "unread"
-                    }`}
-                  ></div>
-
-                  <div className="notification-item-avatar">
-                    {notif.type === "BookingCompleted" ||
-                    (notif.message && notif.message.includes("review")) ? (
-                      <i className="fas fa-star"></i>
-                    ) : (
-                      <i className="fas fa-bell"></i>
-                    )}
-                  </div>
-
-                  <div className="notification-item-content text-start">
-                    <div className="notification-item-title">{notif.message}</div>
-                    <div className="notification-item-time">
-                      <i className="fas fa-clock me-1"></i>
-                      {new Date(notif.createdAt).toLocaleString()}
+                  <div className="d-flex align-items-start gap-3">
+                    <div 
+                      className="flex-shrink-0 rounded-circle d-flex align-items-center justify-content-center"
+                      style={{ 
+                        width: '48px', height: '48px', fontSize: '1.2rem',
+                        background: notif.isRead ? 'rgba(100, 116, 139, 0.1)' : 'rgba(242, 122, 33, 0.1)', 
+                        color: notif.isRead ? '#64748b' : 'var(--app-primary)' 
+                      }}
+                    >
+                      {notif.type === "BookingCompleted" || (notif.message && notif.message.includes("review")) ? (
+                        <i className="fas fa-star"></i>
+                      ) : (
+                        <i className="fas fa-bell"></i>
+                      )}
                     </div>
+                    
+                    <div className="flex-grow-1 font-body">
+                      <div className={`mb-1 ${notif.isRead ? 'text-secondary' : 'text-dark fw-bold'}`}>
+                        {notif.message}
+                      </div>
+                      <div className="text-secondary small">
+                        <i className="fas fa-clock me-1"></i>
+                        {new Date(notif.createdAt).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' })}
+                      </div>
+                    </div>
+                    
+                    {!notif.isRead && (
+                      <div className="flex-shrink-0 mt-2">
+                        <div className="rounded-circle bg-primary" style={{ width: '10px', height: '10px' }}></div>
+                      </div>
+                    )}
                   </div>
                 </button>
               ))}

@@ -50,143 +50,158 @@ const ProviderDashboard = () => {
   };
 
   return (
-    <section className="provider-dashboard-page">
-      <div className="provider-page-header mb-4">
-        <div>
-          <span className="badge rounded-pill text-bg-light border px-3 py-2 mb-2">
-            Provider Panel
-          </span>
-          <h1 className="provider-page-title mb-2">Provider Dashboard</h1>
-          <p className="text-secondary mb-0">
-            Track your bookings, completed jobs, and reviews from one place.
-          </p>
-        </div>
+    <section className="provider-dashboard-page bg-light min-vh-100" style={{ margin: '-2rem', padding: '2rem' }}>
+      {/* Page Header */}
+      <div className="mb-5">
+        <span className="badge rounded-pill px-3 py-1 mb-3 fw-medium" style={{ background: 'rgba(242, 122, 33, 0.1)', color: 'var(--app-primary)' }}>
+          Overview
+        </span>
+        <h1 className="font-display fw-bold text-dark mb-2">Provider Dashboard</h1>
+        <p className="text-secondary font-body mb-0">
+          Track your bookings, completed jobs, and reviews from one place.
+        </p>
       </div>
 
       {loading ? (
-        <div className="card app-card border-0 text-center p-4 p-md-5">
-          <div className="spinner-border text-primary mb-3" role="status"></div>
-          <p className="mb-0 text-secondary">Loading dashboard...</p>
+        <div className="card app-card border rounded-4 text-center p-5 shadow-sm bg-white" style={{ borderColor: 'var(--app-border)' }}>
+          <div className="spinner-border text-primary mb-3" style={{ width: '3rem', height: '3rem' }} role="status"></div>
+          <p className="mb-0 text-secondary font-body">Loading your dashboard...</p>
         </div>
       ) : (
         <>
-          <div className="row g-4 mb-4">
+          {/* Stat Cards Row - Added Borders to make them look like distinct cards */}
+          <div className="row g-4 mb-5">
+            
+            {/* Upcoming Bookings Card */}
             <div className="col-md-6 col-xl-4">
-              <div className="card app-card border-0 provider-stat-card h-100">
-                <div className="card-body p-4">
-                  <div className="provider-stat-top">
-                    <div className="provider-stat-icon">
+              <div 
+                className="card app-card border rounded-4 shadow-sm h-100 bg-white" 
+                style={{ borderColor: '#d1d5db', transition: 'all 0.3s ease' }} 
+                onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-5px)'; e.currentTarget.style.borderColor = 'var(--app-primary)'; }} 
+                onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.borderColor = '#d1d5db'; }}
+              >
+                <div className="card-body p-4 p-lg-5 d-flex flex-column">
+                  <div className="d-flex align-items-center justify-content-between mb-4">
+                    <div className="rounded-3 d-flex align-items-center justify-content-center text-white shadow-warm" style={{ width: '56px', height: '56px', background: 'var(--gradient-warm)', fontSize: '1.5rem' }}>
                       <i className="fas fa-calendar-check"></i>
                     </div>
-                    <div className="provider-stat-number">{upcomingCount}</div>
+                    <h2 className="font-display fw-bold mb-0 text-dark display-6">{upcomingCount}</h2>
                   </div>
-
-                  <h3 className="provider-stat-label">Upcoming Bookings</h3>
-
-                  <NavLink
-                    to="/provider/my-bookings"
-                    className="provider-stat-link"
-                  >
-                    Manage
-                    <i className="fas fa-arrow-right ms-2"></i>
-                  </NavLink>
+                  <h5 className="font-body fw-bold text-dark mb-3">Upcoming Bookings</h5>
+                  <div className="mt-auto pt-3 border-top">
+                    <NavLink to="/provider/my-bookings" className="text-decoration-none fw-bold font-body d-flex align-items-center hover-primary" style={{ color: 'var(--app-primary)' }}>
+                      Manage <i className="fas fa-arrow-right ms-2 small"></i>
+                    </NavLink>
+                  </div>
                 </div>
               </div>
             </div>
 
+            {/* Completed Jobs Card */}
             <div className="col-md-6 col-xl-4">
-              <div className="card app-card border-0 provider-stat-card h-100">
-                <div className="card-body p-4">
-                  <div className="provider-stat-top">
-                    <div className="provider-stat-icon">
+              <div 
+                className="card app-card border rounded-4 shadow-sm h-100 bg-white" 
+                style={{ borderColor: '#d1d5db', transition: 'all 0.3s ease' }} 
+                onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-5px)'; e.currentTarget.style.borderColor = '#198754'; }} 
+                onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.borderColor = '#d1d5db'; }}
+              >
+                <div className="card-body p-4 p-lg-5 d-flex flex-column">
+                  <div className="d-flex align-items-center justify-content-between mb-4">
+                    <div className="rounded-3 d-flex align-items-center justify-content-center text-success" style={{ width: '56px', height: '56px', background: 'rgba(25, 135, 84, 0.1)', fontSize: '1.5rem' }}>
                       <i className="fas fa-clipboard-check"></i>
                     </div>
-                    <div className="provider-stat-number">{completedCount}</div>
+                    <h2 className="font-display fw-bold mb-0 text-dark display-6">{completedCount}</h2>
                   </div>
-
-                  <h3 className="provider-stat-label">Completed Jobs</h3>
-
-                  <NavLink
-                    to="/provider/my-bookings"
-                    className="provider-stat-link"
-                  >
-                    View History
-                    <i className="fas fa-arrow-right ms-2"></i>
-                  </NavLink>
+                  <h5 className="font-body fw-bold text-dark mb-3">Completed Jobs</h5>
+                  <div className="mt-auto pt-3 border-top">
+                    <NavLink to="/provider/my-bookings" className="text-decoration-none fw-bold font-body d-flex align-items-center text-secondary hover-primary">
+                      View History <i className="fas fa-arrow-right ms-2 small"></i>
+                    </NavLink>
+                  </div>
                 </div>
               </div>
             </div>
 
+            {/* Total Reviews Card */}
             <div className="col-md-6 col-xl-4">
-              <div className="card app-card border-0 provider-stat-card h-100">
-                <div className="card-body p-4">
-                  <div className="provider-stat-top">
-                    <div className="provider-stat-icon">
+              <div 
+                className="card app-card border rounded-4 shadow-sm h-100 bg-white" 
+                style={{ borderColor: '#d1d5db', transition: 'all 0.3s ease' }} 
+                onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-5px)'; e.currentTarget.style.borderColor = '#ffc107'; }} 
+                onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.borderColor = '#d1d5db'; }}
+              >
+                <div className="card-body p-4 p-lg-5 d-flex flex-column">
+                  <div className="d-flex align-items-center justify-content-between mb-4">
+                    <div className="rounded-3 d-flex align-items-center justify-content-center text-warning" style={{ width: '56px', height: '56px', background: 'rgba(255, 193, 7, 0.1)', fontSize: '1.5rem' }}>
                       <i className="fas fa-star"></i>
                     </div>
-                    <div className="provider-stat-number">{reviewCount}</div>
+                    <h2 className="font-display fw-bold mb-0 text-dark display-6">{reviewCount}</h2>
                   </div>
-
-                  <h3 className="provider-stat-label">Total Reviews</h3>
-
-                  <NavLink
-                    to="/provider/my-reviews"
-                    className="provider-stat-link"
-                  >
-                    View Reviews
-                    <i className="fas fa-arrow-right ms-2"></i>
-                  </NavLink>
+                  <h5 className="font-body fw-bold text-dark mb-3">Total Reviews</h5>
+                  <div className="mt-auto pt-3 border-top">
+                    <NavLink to="/provider/my-reviews" className="text-decoration-none fw-bold font-body d-flex align-items-center text-secondary hover-primary">
+                      View Reviews <i className="fas fa-arrow-right ms-2 small"></i>
+                    </NavLink>
+                  </div>
                 </div>
               </div>
             </div>
+
           </div>
 
-          <div className="card app-card border-0 provider-bookings-overview">
+          {/* Next Bookings Section - Added prominent border to the main container */}
+          <div className="card app-card border rounded-4 shadow-sm bg-white overflow-hidden" style={{ borderColor: '#cbd5e1' }}>
             <div className="card-body p-4 p-lg-5">
-              <div className="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3 mb-4">
+              
+              <div className="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3 mb-4 border-bottom pb-4">
                 <div>
-                  <h2 className="h4 fw-semibold mb-1">Next Bookings</h2>
-                  <p className="text-secondary mb-0">
+                  <h3 className="font-display fw-bold text-dark mb-1">Next Bookings</h3>
+                  <p className="text-secondary font-body mb-0 small">
                     Your nearest upcoming customer appointments.
                   </p>
                 </div>
-
-                <NavLink
-                  to="/provider/my-bookings"
-                  className="btn btn-outline-primary rounded-pill px-4"
-                >
+                <NavLink to="/provider/my-bookings" className="btn btn-outline-dark rounded-pill px-4 fw-bold font-body">
                   View All
                 </NavLink>
               </div>
 
               {nextBookings.length === 0 ? (
-                <div className="provider-empty-state text-center py-4">
-                  <div className="search-empty-icon mb-3">
+                <div className="text-center py-5 rounded-4 border" style={{ background: 'var(--app-surface-muted)', borderColor: '#e2e8f0' }}>
+                  <div className="mb-3" style={{ fontSize: '2.5rem', color: 'var(--app-primary)', opacity: '0.5' }}>
                     <i className="fas fa-calendar-times"></i>
                   </div>
-                  <h5 className="fw-semibold mb-2">No upcoming bookings</h5>
-                  <p className="text-secondary mb-0">
+                  <h5 className="font-display fw-bold mb-2">No upcoming bookings</h5>
+                  <p className="text-secondary font-body mb-0">
                     Your future bookings will appear here.
                   </p>
                 </div>
               ) : (
-                <div className="d-flex flex-column gap-3">
+                <div className="d-flex flex-column gap-3 font-body">
                   {nextBookings.map((b) => (
-                    <div key={b.id} className="provider-booking-row">
-                      <div>
-                        <div className="fw-semibold">
-                          {new Date(b.bookingDate).toLocaleDateString()}
+                    /* Individual Booking Row with its own border */
+                    <div key={b.id} className="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3 p-4 rounded-4" style={{ border: '1px solid #e2e8f0', background: 'var(--app-surface-muted)' }}>
+                      <div className="d-flex align-items-center gap-3">
+                        <div className="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 bg-white border shadow-sm" style={{ width: '48px', height: '48px', color: 'var(--app-primary)', borderColor: '#cbd5e1' }}>
+                          <i className="fas fa-user"></i>
                         </div>
-                        <div className="text-secondary">{b.customerName}</div>
+                        <div>
+                          <div className="fw-bold text-dark mb-1">{b.customerName}</div>
+                          <div className="text-secondary small">
+                            <i className="far fa-calendar-alt me-1"></i>
+                            {new Date(b.bookingDate).toLocaleDateString()}
+                          </div>
+                        </div>
                       </div>
 
-                      <span className="booking-status-badge booking-status-pending">
+                      <span className="badge rounded-pill bg-warning-subtle text-warning-emphasis border border-warning-subtle px-3 py-2 fw-bold">
+                        <i className="fas fa-circle me-2" style={{ fontSize: '0.5rem', verticalAlign: 'middle' }}></i>
                         {b.status}
                       </span>
                     </div>
                   ))}
                 </div>
               )}
+
             </div>
           </div>
         </>

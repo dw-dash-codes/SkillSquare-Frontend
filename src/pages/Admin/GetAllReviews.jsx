@@ -53,7 +53,7 @@ const GetAllReviews = () => {
     setConfirmConfig({
       isOpen: true,
       title: "Delete Review?",
-      message: "Are you sure you want to delete this review?",
+      message: "Are you sure you want to permanently delete this customer review?",
       onConfirm: async () => {
         try {
           await deleteReview(id);
@@ -71,7 +71,7 @@ const GetAllReviews = () => {
             isOpen: true,
             type: "error",
             title: "Delete Failed",
-            message: "Failed to delete review.",
+            message: "Failed to delete review. Please try again.",
             actions: [{ label: "Close" }],
           });
         }
@@ -83,15 +83,32 @@ const GetAllReviews = () => {
     return [...Array(5)].map((_, i) => (
       <i
         key={i}
-        className={`fas fa-star ${i < rating ? "text-warning" : "text-secondary"}`}
+        className={`${i < rating ? "fas fa-star text-warning" : "far fa-star text-secondary"}`}
+        style={{ fontSize: '0.85rem', marginRight: '2px', opacity: i < rating ? 1 : 0.4 }}
       ></i>
     ));
   };
 
+  const getInitials = (name) => {
+    if (!name) return "C";
+    return name.split(" ").map(n => n[0]).join("").toUpperCase().substring(0, 2);
+  };
+
   if (loading) {
     return (
-      <>
-        {modalConfig.isOpen && (
+      <section className="admin-page bg-light min-vh-100 d-flex align-items-center justify-content-center" style={{ margin: '-2rem', padding: '2rem' }}>
+        <div className="card app-card border rounded-4 text-center p-5 shadow-sm bg-white" style={{ borderColor: 'var(--app-border)' }}>
+          <div className="spinner-border text-primary mb-3" style={{ width: '3rem', height: '3rem' }} role="status"></div>
+          <p className="mb-0 text-secondary font-body">Loading platform reviews...</p>
+        </div>
+      </section>
+    );
+  }
+
+  return (
+    <>
+      {modalConfig.isOpen && (
+        <div className="review-alert-layer" style={{ zIndex: 1060 }}>
           <ModalAlert
             type={modalConfig.type}
             title={modalConfig.title}
@@ -99,119 +116,124 @@ const GetAllReviews = () => {
             actions={modalConfig.actions}
             onClose={closeModal}
           />
-        )}
-
-        <section className="admin-page">
-          <div className="card app-card border-0 text-center p-4 p-md-5">
-            <div className="spinner-border text-primary mb-3" role="status"></div>
-            <p className="mb-0 text-secondary">Loading reviews...</p>
-          </div>
-        </section>
-      </>
-    );
-  }
-
-  return (
-    <>
-      {modalConfig.isOpen && (
-        <ModalAlert
-          type={modalConfig.type}
-          title={modalConfig.title}
-          message={modalConfig.message}
-          actions={modalConfig.actions}
-          onClose={closeModal}
-        />
+        </div>
       )}
 
       {confirmConfig.isOpen && (
-        <ModalAlert
-          type="info"
-          title={confirmConfig.title}
-          message={confirmConfig.message}
-          actions={[
-            {
-              label: "Proceed",
-              onClick: async () => {
-                await confirmConfig.onConfirm?.();
-                closeConfirm();
+        <div className="review-alert-layer" style={{ zIndex: 1060 }}>
+          <ModalAlert
+            type="info"
+            title={confirmConfig.title}
+            message={confirmConfig.message}
+            actions={[
+              {
+                label: "Delete",
+                onClick: async () => {
+                  await confirmConfig.onConfirm?.();
+                  closeConfirm();
+                },
               },
-            },
-            {
-              label: "Cancel",
-              onClick: closeConfirm,
-            },
-          ]}
-          onClose={closeConfirm}
-        />
+              {
+                label: "Cancel",
+                onClick: closeConfirm,
+              },
+            ]}
+            onClose={closeConfirm}
+          />
+        </div>
       )}
 
-      <section className="admin-page">
-        <div className="admin-page-header mb-4">
-          <div>
-            <span className="badge rounded-pill text-bg-light border px-3 py-2 mb-2">
-              Admin Panel
-            </span>
-            <h1 className="admin-page-title mb-2">Manage Reviews</h1>
-            <p className="text-secondary mb-0">
-              Monitor customer feedback and remove inappropriate reviews when needed.
-            </p>
-          </div>
+      <section className="admin-page bg-light min-vh-100" style={{ margin: '-2rem', padding: '2rem' }}>
+        
+        {/* Page Header */}
+        <div className="mb-5">
+          <span className="badge rounded-pill px-3 py-1 mb-3 fw-bold font-body text-uppercase" style={{ background: 'rgba(255, 193, 7, 0.1)', color: '#d97706', letterSpacing: '0.5px', fontSize: '0.75rem' }}>
+            Moderation
+          </span>
+          <h1 className="font-display fw-bold text-dark display-6 mb-2">Manage Reviews</h1>
+          <p className="text-secondary font-body mb-0">
+            Monitor customer feedback and remove inappropriate reviews.
+          </p>
         </div>
 
-        <div className="card app-card border-0 admin-table-card">
-          <div className="card-body p-0">
-            <div className="p-4 pb-3 border-bottom">
-              <h2 className="h5 fw-semibold mb-1">All Customer Reviews</h2>
-              <p className="text-secondary mb-0">
-                Ratings, comments, and provider feedback shared by customers.
-              </p>
-            </div>
+        {/* Data List Card */}
+        <div className="card app-card border rounded-4 shadow-sm bg-white overflow-hidden" style={{ borderColor: '#cbd5e1' }}>
+          
+          <div className="card-header bg-white border-bottom p-4">
+            <h4 className="font-display fw-bold text-dark mb-1">Platform Feedback</h4>
+            <p className="text-secondary font-body mb-0 small">
+              Showing {reviews.length} total reviews
+            </p>
+          </div>
 
+          <div className="card-body p-0">
             {reviews.length === 0 ? (
-              <div className="text-center p-4 p-md-5">
-                <div className="search-empty-icon mb-3">
+              <div className="text-center py-5">
+                <div className="mb-3" style={{ fontSize: '3rem', color: '#e2e8f0' }}>
                   <i className="fas fa-comment-slash"></i>
                 </div>
-                <h5 className="fw-semibold mb-2">No reviews found</h5>
-                <p className="text-secondary mb-0">
-                  Customer reviews will appear here once available.
-                </p>
+                <h5 className="font-display fw-bold text-dark mb-2">No reviews found</h5>
+                <p className="text-secondary font-body mb-0">Customer reviews will appear here once available.</p>
               </div>
             ) : (
-              <div className="d-flex flex-column">
-                {reviews.map((review) => (
-                  <div key={review.id} className="admin-review-row">
-                    <div className="d-flex flex-column flex-lg-row justify-content-between align-items-lg-start gap-3 w-100">
-                      <div className="flex-grow-1">
-                        <div className="d-flex flex-column flex-sm-row align-items-sm-center gap-2 mb-2">
-                          <h6 className="mb-0 fw-semibold">{review.customerName}</h6>
-                          <span className="badge rounded-pill text-bg-light border px-3 py-2">
-                            {new Date(review.createdAt).toLocaleDateString()}
-                          </span>
+              <div className="d-flex flex-column font-body">
+                {reviews.map((review, index) => (
+                  <div 
+                    key={review.id} 
+                    className="p-4" 
+                    style={{ borderBottom: index === reviews.length - 1 ? 'none' : '1px solid #f1f5f9' }}
+                  >
+                    <div className="d-flex flex-column flex-lg-row justify-content-between align-items-lg-start gap-4">
+                      
+                      {/* Review Content */}
+                      <div className="d-flex align-items-start gap-3 flex-grow-1">
+                        
+                        {/* Avatar */}
+                        <div 
+                          className="flex-shrink-0 rounded-circle d-flex align-items-center justify-content-center text-white fw-bold shadow-sm" 
+                          style={{ width: '45px', height: '45px', background: 'var(--gradient-warm)', fontSize: '1rem' }}
+                        >
+                          {getInitials(review.customerName)}
                         </div>
 
-                        <div className="d-flex align-items-center flex-wrap gap-2 mb-2 admin-review-stars">
-                          <div>{renderStars(review.rating)}</div>
-                          <span className="fw-semibold text-dark">
-                            “{review.comment}”
-                          </span>
-                        </div>
+                        <div className="w-100">
+                          {/* Header Line */}
+                          <div className="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center mb-1">
+                            <h6 className="mb-0 fw-bold text-dark">{review.customerName || "Anonymous Customer"}</h6>
+                            <span className="text-secondary small" style={{ fontSize: '0.8rem' }}>
+                              {new Date(review.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
+                            </span>
+                          </div>
+                          
+                          {/* Sub Header & Stars */}
+                          <div className="d-flex align-items-center gap-2 mb-3">
+                            <div className="d-flex align-items-center">
+                              {renderStars(review.rating)}
+                            </div>
+                            <span className="text-secondary small" style={{ fontSize: '0.8rem' }}>•</span>
+                            <span className="text-secondary small" style={{ fontSize: '0.8rem' }}>
+                              Reviewed Provider: <strong className="text-dark">{review.providerName}</strong>
+                            </span>
+                          </div>
 
-                        <small className="text-secondary">
-                          Review for Provider: <strong>{review.providerName}</strong>
-                        </small>
+                          {/* Review Text */}
+                          <p className="text-dark-emphasis mb-0" style={{ lineHeight: '1.6', fontSize: '0.95rem' }}>
+                            "{review.comment || "No written comment provided."}"
+                          </p>
+                        </div>
                       </div>
 
-                      <div className="d-flex justify-content-end">
+                      {/* Action Button */}
+                      <div className="flex-shrink-0 mt-3 mt-lg-0 text-end">
                         <button
                           onClick={() => handleDelete(review.id)}
-                          className="btn btn-sm btn-outline-danger rounded-pill px-3"
+                          className="btn btn-sm btn-outline-danger rounded-pill px-4 fw-bold bg-white shadow-sm"
                           title="Delete Review"
                         >
-                          <i className="fas fa-trash-alt me-1"></i>
-                          Delete
+                          <i className="fas fa-trash-alt me-1"></i> Delete
                         </button>
                       </div>
+                      
                     </div>
                   </div>
                 ))}
@@ -219,6 +241,7 @@ const GetAllReviews = () => {
             )}
           </div>
         </div>
+
       </section>
     </>
   );

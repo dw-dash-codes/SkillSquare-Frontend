@@ -23,98 +23,74 @@ const SuperAdminLogin = () => {
       if (role === "Admin") {
         navigate("/admin/");
       } else {
-        setError("You are not authorized as Admin");
+        setError("Unauthorized access.");
         localStorage.clear();
       }
     } catch (err) {
-      setError(err.message || "Login failed");
+      setError(err.message || "Invalid credentials.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <section className="app-section app-section-hero auth-page min-vh-100 d-flex align-items-center">
-      <div className="container">
-        <div className="row justify-content-center">
-          <div className="col-xl-5 col-lg-6 col-md-8">
-            <div className="card app-card border-0 auth-card admin-login-card">
-              <div className="card-body p-4 p-md-5">
-                <div className="text-center mb-4">
-                  <div className="auth-icon-circle mx-auto mb-3">
-                    <i className="fas fa-user-shield"></i>
-                  </div>
+    <section className="bg-light min-vh-100 d-flex align-items-center justify-content-center px-3">
+      
+      {/* Ultra-minimal, centered card restricted to 400px width */}
+      <div className="card border-0 rounded-4 shadow-sm w-100" style={{ maxWidth: '400px', background: '#ffffff' }}>
+        <div className="card-body p-4 p-sm-5">
+          
+          <div className="text-center mb-4">
+            <h2 className="font-display fw-bold text-dark mb-1">Admin Portal</h2>
+            <p className="text-secondary font-body small mb-0">Secure restricted access</p>
+          </div>
 
-                  <span className="badge rounded-pill text-bg-light border px-3 py-2 mb-3">
-                    Admin Access
-                  </span>
+          {error && (
+            <div className="alert alert-danger rounded-3 font-body small py-2 text-center border-0" style={{ background: '#fef2f2', color: '#ef4444' }} role="alert">
+              {error}
+            </div>
+          )}
 
-                  <h1 className="h3 fw-bold mb-2">Skill Square Admin</h1>
-                  <p className="text-secondary mb-0">
-                    Secure login to access the admin dashboard.
-                  </p>
-                </div>
-
-                {error && (
-                  <div className="alert alert-danger rounded-4 mb-4" role="alert">
-                    {error}
-                  </div>
-                )}
-
-                <form onSubmit={handleLogin}>
-                  <div className="row g-3">
-                    <div className="col-12">
-                      <label className="form-label auth-label">Email Address</label>
-                      <input
-                        className="form-control auth-input"
-                        type="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        placeholder="Enter email"
-                        required
-                      />
-                    </div>
-
-                    <div className="col-12">
-                      <label className="form-label auth-label">Password</label>
-                      <input
-                        className="form-control auth-input"
-                        type="password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        placeholder="Enter password"
-                        required
-                      />
-                    </div>
-                  </div>
-
-                  <button
-                    type="submit"
-                    className="btn btn-primary w-100 rounded-pill py-3 fw-semibold mt-4"
-                    disabled={loading}
-                  >
-                    {loading ? (
-                      <>
-                        <i className="fas fa-spinner fa-spin me-2"></i>
-                        Signing in...
-                      </>
-                    ) : (
-                      <>
-                        <i className="fas fa-lock me-2"></i>
-                        Sign In
-                      </>
-                    )}
-                  </button>
-                </form>
-              </div>
+          <form onSubmit={handleLogin} className="font-body">
+            <div className="mb-3">
+              <label className="form-label fw-bold text-dark small mb-1">Email</label>
+              <input
+                className="form-control px-3 py-2 bg-light border-0 shadow-none"
+                style={{ borderRadius: '0.5rem' }}
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="admin@skillsquare.com"
+                required
+              />
             </div>
 
-            <p className="text-center text-secondary mt-3 mb-0 small">
-              © 2025 Skill Square
-            </p>
-          </div>
+            <div className="mb-4">
+              <label className="form-label fw-bold text-dark small mb-1">Password</label>
+              <input
+                className="form-control px-3 py-2 bg-light border-0 shadow-none"
+                style={{ borderRadius: '0.5rem' }}
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Enter password"
+                required
+              />
+            </div>
+
+            <button
+              type="submit"
+              className="btn btn-dark w-100 py-2 fw-bold"
+              disabled={loading}
+              style={{ borderRadius: '0.5rem', transition: 'all 0.2s ease', backgroundColor: '#0f172a' }}
+            >
+              {loading ? "Authenticating..." : "Sign In"}
+            </button>
+          </form>
+
         </div>
       </div>
+
     </section>
   );
 };

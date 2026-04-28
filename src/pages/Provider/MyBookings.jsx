@@ -80,18 +80,18 @@ const MyBookings = () => {
     });
   };
 
-  const getStatusBadgeClass = (status) => {
+  const getStatusBadge = (status) => {
     switch (status) {
       case "Completed":
-        return "booking-status-completed";
+        return <span className="badge rounded-pill bg-success-subtle text-success border border-success-subtle px-3 py-2 font-body fw-bold"><i className="fas fa-check-double me-1"></i>Completed</span>;
       case "Pending":
-        return "booking-status-pending";
+        return <span className="badge rounded-pill bg-warning-subtle text-warning-emphasis border border-warning-subtle px-3 py-2 font-body fw-bold"><i className="fas fa-clock me-1"></i>Pending</span>;
       case "Accepted":
-        return "booking-status-confirmed";
+        return <span className="badge rounded-pill bg-info-subtle text-info-emphasis border border-info-subtle px-3 py-2 font-body fw-bold"><i className="fas fa-thumbs-up me-1"></i>Accepted</span>;
       case "Rejected":
-        return "booking-status-cancelled";
+        return <span className="badge rounded-pill bg-danger-subtle text-danger border border-danger-subtle px-3 py-2 font-body fw-bold"><i className="fas fa-times me-1"></i>Rejected</span>;
       default:
-        return "booking-status-cancelled";
+        return <span className="badge rounded-pill bg-secondary-subtle text-secondary border border-secondary-subtle px-3 py-2 font-body fw-bold">{status}</span>;
     }
   };
 
@@ -99,8 +99,19 @@ const MyBookings = () => {
 
   if (loading) {
     return (
-      <>
-        {modalConfig.isOpen && (
+      <section className="provider-page bg-light min-vh-100 d-flex align-items-center justify-content-center" style={{ margin: '-2rem', padding: '2rem' }}>
+        <div className="card app-card border rounded-4 text-center p-5 shadow-sm bg-white" style={{ borderColor: 'var(--app-border)' }}>
+          <div className="spinner-border text-primary mb-3" style={{ width: '3rem', height: '3rem' }} role="status"></div>
+          <p className="mb-0 text-secondary font-body">Loading bookings...</p>
+        </div>
+      </section>
+    );
+  }
+
+  return (
+    <>
+      {modalConfig.isOpen && (
+        <div className="review-alert-layer" style={{ zIndex: 1060 }}>
           <ModalAlert
             type={modalConfig.type}
             title={modalConfig.title}
@@ -108,166 +119,148 @@ const MyBookings = () => {
             actions={modalConfig.actions}
             onClose={closeModal}
           />
-        )}
-
-        <section className="provider-page">
-          <div className="card app-card border-0 text-center p-4 p-md-5">
-            <div className="spinner-border text-primary mb-3" role="status"></div>
-            <p className="mb-0 text-secondary">Loading bookings...</p>
-          </div>
-        </section>
-      </>
-    );
-  }
-
-  return (
-    <>
-      {modalConfig.isOpen && (
-        <ModalAlert
-          type={modalConfig.type}
-          title={modalConfig.title}
-          message={modalConfig.message}
-          actions={modalConfig.actions}
-          onClose={closeModal}
-        />
+        </div>
       )}
 
-      <section className="provider-page">
-        <div className="provider-page-header mb-4">
-          <div>
-            <span className="badge rounded-pill text-bg-light border px-3 py-2 mb-2">
-              Provider Panel
-            </span>
-            <h1 className="provider-page-title mb-2">My Bookings</h1>
-            <p className="text-secondary mb-0">
-              Review, manage, and update your incoming booking requests.
-            </p>
-          </div>
+      <section className="provider-page bg-light min-vh-100" style={{ margin: '-2rem', padding: '2rem' }}>
+        <div className="mb-4">
+          <span className="badge rounded-pill px-3 py-1 mb-3 fw-medium" style={{ background: 'rgba(242, 122, 33, 0.1)', color: 'var(--app-primary)' }}>
+            Provider Panel
+          </span>
+          <h1 className="font-display fw-bold text-dark mb-2">My Bookings</h1>
+          <p className="text-secondary font-body mb-0">
+            Review, manage, and update your incoming booking requests.
+          </p>
         </div>
 
-        <div className="card app-card border-0 provider-booking-filter-card mb-4">
-          <div className="card-body p-3 p-md-4">
-            <div className="d-flex flex-wrap gap-2">
-              {filters.map((status) => (
-                <button
-                  key={status}
-                  type="button"
-                  className={`provider-filter-pill ${
-                    activeFilter === status ? "active" : ""
-                  }`}
-                  onClick={() => setActiveFilter(status)}
-                >
-                  {status}
-                </button>
-              ))}
-            </div>
+        {/* Filters */}
+        <div className="mb-5">
+          <div className="d-flex flex-wrap gap-2">
+            {filters.map((status) => (
+              <button
+                key={status}
+                type="button"
+                className={`btn rounded-pill px-4 py-2 font-body fw-bold ${
+                  activeFilter === status 
+                    ? "btn-gradient-warm text-white shadow-warm border-0" 
+                    : "bg-white text-secondary border shadow-sm hover-primary"
+                }`}
+                style={{ borderColor: activeFilter !== status ? 'var(--app-border)' : 'transparent' }}
+                onClick={() => setActiveFilter(status)}
+              >
+                {status}
+              </button>
+            ))}
           </div>
         </div>
 
         {getFilteredBookings().length === 0 ? (
-          <div className="card app-card border-0 text-center p-4 p-md-5">
-            <div className="search-empty-icon mb-3">
+          <div className="card app-card border rounded-4 text-center p-5 shadow-sm bg-white" style={{ borderColor: 'var(--app-border)' }}>
+            <div className="mb-3" style={{ fontSize: '3rem', color: 'var(--app-primary)', opacity: '0.5' }}>
               <i className="fas fa-calendar-times"></i>
             </div>
-            <h4 className="fw-semibold mb-2">No bookings found</h4>
-            <p className="text-secondary mb-0">
+            <h4 className="font-display fw-bold mb-2">No bookings found</h4>
+            <p className="text-secondary font-body mb-0">
               There are no bookings in this filter right now.
             </p>
           </div>
         ) : (
           <div className="d-flex flex-column gap-4">
             {getFilteredBookings().map((booking) => (
-              <div key={booking.id} className="card app-card border-0 provider-booking-card-v2">
+              <div key={booking.id} className="card app-card border rounded-4 shadow-sm bg-white overflow-hidden" style={{ borderColor: '#cbd5e1' }}>
                 <div className="card-body p-4 p-lg-5">
-                  <div className="d-flex flex-column flex-lg-row justify-content-between align-items-lg-start gap-3 mb-4">
-                    <div>
-                      <h3 className="h5 fw-semibold mb-2">Booking #{booking.id}</h3>
-                      <p className="text-secondary mb-0">
-                        <i className="fas fa-calendar me-2"></i>
-                        {formatDate(booking.bookingDate)} at {booking.bookingTime}
-                      </p>
-                    </div>
-
-                    <span className={`booking-status-badge ${getStatusBadgeClass(booking.status)}`}>
-                      {booking.status}
-                    </span>
-                  </div>
-
-                  <div className="row g-3 mb-4">
-                    <div className="col-md-4">
-                      <div className="booking-detail-card h-100">
-                        <div className="booking-detail-icon">
-                          <i className="fas fa-user"></i>
-                        </div>
-                        <div>
-                          <h6 className="fw-semibold mb-1">Customer Name</h6>
-                          <p className="text-secondary mb-0">{booking.customerName}</p>
-                        </div>
+                  
+                  {/* Header */}
+                  <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-start gap-3 mb-4 border-bottom pb-4">
+                    <div className="d-flex align-items-center gap-3">
+                      <div className="rounded-circle d-flex align-items-center justify-content-center bg-light border shadow-sm" style={{ width: '56px', height: '56px', color: 'var(--app-primary)', fontSize: '1.5rem', borderColor: '#e2e8f0' }}>
+                        <i className="fas fa-user"></i>
+                      </div>
+                      <div>
+                        <h3 className="font-display fw-bold text-dark mb-1">{booking.customerName}</h3>
+                        <p className="text-secondary font-body small mb-0">
+                          Booking #{booking.id} • Created on {new Date(booking.createdAt).toLocaleDateString()}
+                        </p>
                       </div>
                     </div>
-
-                    <div className="col-md-4">
-                      <div className="booking-detail-card h-100">
-                        <div className="booking-detail-icon">
-                          <i className="fas fa-phone"></i>
-                        </div>
-                        <div>
-                          <h6 className="fw-semibold mb-1">Phone Number</h6>
-                          <p className="text-secondary mb-0">{booking.customerPhone}</p>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="col-md-4">
-                      <div className="booking-detail-card h-100">
-                        <div className="booking-detail-icon">
-                          <i className="fas fa-map-marker-alt"></i>
-                        </div>
-                        <div>
-                          <h6 className="fw-semibold mb-1">Address</h6>
-                          <p className="text-secondary mb-0">{booking.customerAddress}</p>
-                        </div>
-                      </div>
+                    <div className="flex-shrink-0 mt-2 mt-md-0">
+                      {getStatusBadge(booking.status)}
                     </div>
                   </div>
 
-                  <div className="booking-work-box mb-4">
-                    <h6 className="fw-semibold mb-2">Description</h6>
-                    <p className="text-secondary mb-0">
-                      {booking.description || "No description provided."}
+                  {/* Info Grid */}
+                  <div className="row g-3 mb-4 font-body">
+                    <div className="col-md-4">
+                      <div className="d-flex align-items-start gap-3 p-3 rounded-3 h-100 bg-light" style={{ border: '1px solid var(--app-border)' }}>
+                        <div className="text-primary mt-1"><i className="fas fa-phone"></i></div>
+                        <div>
+                          <div className="fw-bold text-dark small mb-1">Phone Number</div>
+                          <div className="text-secondary small">{booking.customerPhone}</div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="col-md-4">
+                      <div className="d-flex align-items-start gap-3 p-3 rounded-3 h-100 bg-light" style={{ border: '1px solid var(--app-border)' }}>
+                        <div className="text-primary mt-1"><i className="fas fa-map-marker-alt"></i></div>
+                        <div>
+                          <div className="fw-bold text-dark small mb-1">Address</div>
+                          <div className="text-secondary small">{booking.customerAddress}</div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="col-md-4">
+                      <div className="d-flex align-items-start gap-3 p-3 rounded-3 h-100 bg-light" style={{ border: '1px solid var(--app-border)' }}>
+                        <div className="text-primary mt-1"><i className="fas fa-clock"></i></div>
+                        <div>
+                          <div className="fw-bold text-dark small mb-1">Scheduled For</div>
+                          <div className="text-secondary small">
+                            {formatDate(booking.bookingDate)} <br/>
+                            at {booking.bookingTime}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Description Box */}
+                  <div className="p-4 rounded-4 mb-4 font-body" style={{ background: 'var(--app-surface-muted)', border: '1px solid var(--app-border)' }}>
+                    <h6 className="fw-bold text-dark mb-2"><i className="fas fa-clipboard-list me-2" style={{ color: 'var(--app-primary)' }}></i>Task Description</h6>
+                    <p className="text-secondary mb-0" style={{ lineHeight: '1.6' }}>
+                      {booking.description || "No description provided by the customer."}
                     </p>
                   </div>
 
-                  <div className="d-flex flex-wrap gap-2">
+                  {/* Actions */}
+                  <div className="d-flex flex-wrap gap-3 font-body">
                     {booking.status === "Pending" && (
                       <>
                         <button
-                          className="btn btn-success rounded-pill px-4"
+                          className="btn btn-success rounded-pill px-4 py-2 fw-bold shadow-sm"
                           onClick={() => updateStatus(booking.id, "Accepted")}
                         >
-                          <i className="fas fa-check me-2"></i>
-                          Accept
+                          <i className="fas fa-check me-2"></i> Accept Job
                         </button>
                         <button
-                          className="btn btn-outline-danger rounded-pill px-4"
+                          className="btn btn-outline-danger rounded-pill px-4 py-2 fw-bold bg-white"
                           onClick={() => updateStatus(booking.id, "Rejected")}
                         >
-                          <i className="fas fa-times me-2"></i>
-                          Reject
+                          <i className="fas fa-times me-2"></i> Reject
                         </button>
                       </>
                     )}
 
                     {booking.status === "Accepted" && (
                       <button
-                        className="btn btn-primary rounded-pill px-4"
+                        className="btn btn-gradient-warm rounded-pill px-5 py-2 fw-bold shadow-warm"
                         onClick={() => updateStatus(booking.id, "Completed")}
                       >
-                        <i className="fas fa-check-double me-2"></i>
-                        Mark Completed
+                        <i className="fas fa-check-double me-2"></i> Mark as Completed
                       </button>
                     )}
                   </div>
+
                 </div>
               </div>
             ))}
