@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
 import api from "../services/api";
+import ModalAlert from "../components/ModalAlert"; // ModalAlert import kiya
 
 const ProviderDetails = () => {
   const { id } = useParams();
@@ -12,7 +13,36 @@ const ProviderDetails = () => {
   const [rating, setRating] = useState({ averageRating: 0, totalReviews: 0 });
   const [loading, setLoading] = useState(true);
 
+  // Modal State Add Ki
+  const [modalConfig, setModalConfig] = useState({
+    isOpen: false,
+    type: "",
+    title: "",
+    message: "",
+    actions: [],
+  });
+
+  const closeModal = () => {
+    setModalConfig((prev) => ({ ...prev, isOpen: false }));
+  };
+
   const handleBooking = () => {
+    // Check current user role from localStorage
+    const userRole = localStorage.getItem("role");
+
+    if (userRole === "Provider") {
+      // Show Modal if user is a Provider
+      setModalConfig({
+        isOpen: true,
+        type: "warning",
+        title: "Action Not Allowed",
+        message: "You must be logged in as a Customer to book an appointment.",
+        actions: [{ label: "Got it" }],
+      });
+      return; // Navigation rok dega
+    }
+
+    // Agar Customer hai ya logged in nahi hai toh aagay janay de
     navigate(`/book-a-technitian/${provider.id}`);
   };
 
@@ -85,210 +115,223 @@ const ProviderDetails = () => {
   }
 
   return (
-    <section className="app-section bg-light min-vh-100" style={{ paddingTop: '110px', paddingBottom: '80px' }}>
-      <div className="container">
-        
-        {/* Back Navigation */}
-        <div className="mb-4">
-          <button onClick={() => navigate(-1)} className="btn btn-link text-decoration-none text-secondary font-body small p-0 hover-primary">
-            <i className="fas fa-arrow-left me-2"></i> Back to Providers
-          </button>
-        </div>
+    <>
+      {/* Modal Alert Component */}
+      {modalConfig.isOpen && (
+        <ModalAlert
+          type={modalConfig.type}
+          title={modalConfig.title}
+          message={modalConfig.message}
+          actions={modalConfig.actions}
+          onClose={closeModal}
+        />
+      )}
 
-        <div className="row g-4">
-          {/* Main Content Column */}
-          <div className="col-lg-8">
-            
-            {/* Hero Profile Card */}
-            <div className="card app-card border-0 rounded-4 shadow-sm mb-4 bg-white">
-              <div className="card-body p-4 p-lg-5">
-                <div className="d-flex flex-column flex-md-row align-items-center align-items-md-start gap-4">
-                  {/* Avatar */}
-                  <div 
-                    className="flex-shrink-0 rounded-circle d-flex align-items-center justify-content-center text-white font-display fw-bold shadow-sm" 
-                    style={{ width: '100px', height: '100px', fontSize: '2.5rem', background: 'var(--gradient-warm)' }}
-                  >
-                    {getInitials(provider.firstName, provider.lastName)}
-                  </div>
+      <section className="app-section bg-light min-vh-100" style={{ paddingTop: '110px', paddingBottom: '80px' }}>
+        <div className="container">
+          
+          {/* Back Navigation */}
+          <div className="mb-4">
+            <Link onClick={() => navigate(-1)} className="text-decoration-none text-secondary font-body small hover-primary mb-3 d-inline-block">
+              <i className="fas fa-arrow-left me-2"></i> Back
+            </Link>
+          </div>
 
-                  {/* Info */}
-                  <div className="text-center text-md-start flex-grow-1">
-                    <h1 className="font-display fw-bold text-dark mb-1">
-                      {provider.firstName} {provider.lastName}
-                    </h1>
-                    <p className="text-secondary font-body mb-3 fs-5">
-                      {categoryName || "Service Provider"}
-                    </p>
+          <div className="row g-4">
+            {/* Main Content Column */}
+            <div className="col-lg-8">
+              
+              {/* Hero Profile Card */}
+              <div className="card app-card border-0 rounded-4 shadow-sm mb-4 bg-white">
+                <div className="card-body p-4 p-lg-5">
+                  <div className="d-flex flex-column flex-md-row align-items-center align-items-md-start gap-4">
+                    {/* Avatar */}
+                    <div 
+                      className="flex-shrink-0 rounded-circle d-flex align-items-center justify-content-center text-white font-display fw-bold shadow-sm" 
+                      style={{ width: '100px', height: '100px', fontSize: '2.5rem', background: 'var(--gradient-warm)' }}
+                    >
+                      {getInitials(provider.firstName, provider.lastName)}
+                    </div>
 
-                    <div className="d-flex flex-wrap gap-3 justify-content-center justify-content-md-start align-items-center font-body">
-                      {/* Rating */}
-                      <div className="d-flex align-items-center px-3 py-2 rounded-pill" style={{ background: 'var(--app-surface-muted)', border: '1px solid var(--app-border)' }}>
-                        <i className="fas fa-star me-2" style={{ color: 'var(--app-primary)' }}></i>
-                        <span className="fw-bold text-dark me-1">{rating.averageRating.toFixed(1)}</span>
-                        <span className="text-secondary small">({rating.totalReviews} reviews)</span>
-                      </div>
+                    {/* Info */}
+                    <div className="text-center text-md-start flex-grow-1">
+                      <h1 className="font-display fw-bold text-dark mb-1">
+                        {provider.firstName} {provider.lastName}
+                      </h1>
+                      <p className="text-secondary font-body mb-3 fs-5">
+                        {categoryName || "Service Provider"}
+                      </p>
 
-                      {/* Rate */}
-                      {provider.hourlyRate > 0 && (
-                        <div className="d-flex align-items-center px-3 py-2 rounded-pill fw-bold text-dark" style={{ background: 'var(--app-surface-muted)', border: '1px solid var(--app-border)' }}>
-                          <i className="fas fa-clock me-2" style={{ color: 'var(--app-primary)' }}></i>
-                          ${provider.hourlyRate}/hr
+                      <div className="d-flex flex-wrap gap-3 justify-content-center justify-content-md-start align-items-center font-body">
+                        {/* Rating */}
+                        <div className="d-flex align-items-center px-3 py-2 rounded-pill" style={{ background: 'var(--app-surface-muted)', border: '1px solid var(--app-border)' }}>
+                          <i className="fas fa-star me-2" style={{ color: 'var(--app-primary)' }}></i>
+                          <span className="fw-bold text-dark me-1">{rating.averageRating.toFixed(1)}</span>
+                          <span className="text-secondary small">({rating.totalReviews} reviews)</span>
                         </div>
-                      )}
+
+                        {/* Rate */}
+                        {provider.hourlyRate > 0 && (
+                          <div className="d-flex align-items-center px-3 py-2 rounded-pill fw-bold text-dark" style={{ background: 'var(--app-surface-muted)', border: '1px solid var(--app-border)' }}>
+                            <i className="fas fa-clock me-2" style={{ color: 'var(--app-primary)' }}></i>
+                            ${provider.hourlyRate}/hr
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
 
-            {/* About Card */}
-            <div className="card app-card border-0 rounded-4 shadow-sm mb-4 bg-white">
-              <div className="card-body p-4 p-lg-5">
-                <h3 className="font-display fw-bold text-dark mb-4 border-bottom pb-3">
-                  About
-                </h3>
-                <p className="text-secondary font-body mb-4" style={{ lineHeight: '1.7', fontSize: '1.05rem' }}>
-                  {provider.bio || "No bio available for this provider yet."}
-                </p>
+              {/* About Card */}
+              <div className="card app-card border-0 rounded-4 shadow-sm mb-4 bg-white">
+                <div className="card-body p-4 p-lg-5">
+                  <h3 className="font-display fw-bold text-dark mb-4 border-bottom pb-3">
+                    About
+                  </h3>
+                  <p className="text-secondary font-body mb-4" style={{ lineHeight: '1.7', fontSize: '1.05rem' }}>
+                    {provider.bio || "No bio available for this provider yet."}
+                  </p>
 
-                {provider.skills && (
-                  <div>
-                    <h6 className="font-display fw-bold text-dark mb-3">Expertise & Skills</h6>
-                    <div className="d-flex flex-wrap gap-2">
-                      {/* Splitting skills by comma if it's a string, or just displaying it */}
-                      {provider.skills.split(',').map((skill, index) => (
-                        <span key={index} className="badge rounded-pill text-dark font-body fw-medium px-3 py-2" style={{ background: 'var(--app-surface-muted)', border: '1px solid var(--app-border)', fontSize: '0.9rem' }}>
-                          {skill.trim()}
-                        </span>
+                  {provider.skills && (
+                    <div>
+                      <h6 className="font-display fw-bold text-dark mb-3">Expertise & Skills</h6>
+                      <div className="d-flex flex-wrap gap-2">
+                        {/* Splitting skills by comma if it's a string, or just displaying it */}
+                        {provider.skills.split(',').map((skill, index) => (
+                          <span key={index} className="badge rounded-pill text-dark font-body fw-medium px-3 py-2" style={{ background: 'var(--app-surface-muted)', border: '1px solid var(--app-border)', fontSize: '0.9rem' }}>
+                            {skill.trim()}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Reviews Card */}
+              <div className="card app-card border-0 rounded-4 shadow-sm bg-white">
+                <div className="card-body p-4 p-lg-5">
+                  <div className="d-flex align-items-center justify-content-between mb-4 border-bottom pb-3">
+                    <h3 className="font-display fw-bold text-dark mb-0">
+                      Reviews <span className="text-secondary fs-5">({reviews.length})</span>
+                    </h3>
+                  </div>
+
+                  {reviews.length === 0 ? (
+                    <div className="text-center py-5">
+                      <div className="mb-3" style={{ fontSize: '2.5rem', color: 'var(--app-primary)', opacity: '0.5' }}>
+                        <i className="fas fa-comment-slash"></i>
+                      </div>
+                      <p className="text-secondary font-body mb-0">No reviews yet for this provider.</p>
+                    </div>
+                  ) : (
+                    <div className="d-flex flex-column gap-4">
+                      {reviews.map((review) => (
+                        <div key={review.id} className="p-4 rounded-4" style={{ border: '1px solid var(--app-border)', background: 'var(--app-surface)' }}>
+                          <div className="d-flex align-items-start gap-3">
+                            {/* Reviewer Avatar */}
+                            <div 
+                              className="flex-shrink-0 rounded-circle d-flex align-items-center justify-content-center text-primary font-body fw-bold" 
+                              style={{ width: '48px', height: '48px', background: 'rgba(242, 122, 33, 0.1)', fontSize: '1.1rem' }}
+                            >
+                              {getInitials(review.customerName, "")}
+                            </div>
+
+                            <div className="flex-grow-1">
+                              <div className="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center mb-2">
+                                <h6 className="font-display fw-bold text-dark mb-1 mb-sm-0">
+                                  {review.customerName || "Customer"}
+                                </h6>
+                                <span className="text-secondary font-body small">
+                                  {new Date(review.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
+                                </span>
+                              </div>
+
+                              <div className="mb-2">
+                                {Array.from({ length: 5 }, (_, i) => (
+                                  <i
+                                    key={i}
+                                    className={`me-1 ${
+                                      i < review.rating ? "fas fa-star" : "far fa-star"
+                                    }`}
+                                    style={{ color: i < review.rating ? 'var(--app-primary)' : '#e4e5e9', fontSize: '0.9rem' }}
+                                  ></i>
+                                ))}
+                              </div>
+
+                              <p className="text-secondary font-body mb-0" style={{ lineHeight: '1.6' }}>
+                                {review.comment}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
                       ))}
                     </div>
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
             </div>
 
-            {/* Reviews Card */}
-            <div className="card app-card border-0 rounded-4 shadow-sm bg-white">
-              <div className="card-body p-4 p-lg-5">
-                <div className="d-flex align-items-center justify-content-between mb-4 border-bottom pb-3">
-                  <h3 className="font-display fw-bold text-dark mb-0">
-                    Reviews <span className="text-secondary fs-5">({reviews.length})</span>
-                  </h3>
-                </div>
+            {/* Sidebar / Booking Column */}
+            <div className="col-lg-4">
+              <div className="card app-card border-0 rounded-4 shadow-sm bg-white" style={{ position: 'sticky', top: '100px' }}>
+                <div className="card-body p-4 p-lg-5">
+                  <h4 className="font-display fw-bold text-dark mb-4 text-center">
+                    Book {provider.firstName}
+                  </h4>
 
-                {reviews.length === 0 ? (
-                  <div className="text-center py-5">
-                    <div className="mb-3" style={{ fontSize: '2.5rem', color: 'var(--app-primary)', opacity: '0.5' }}>
-                      <i className="fas fa-comment-slash"></i>
-                    </div>
-                    <p className="text-secondary font-body mb-0">No reviews yet for this provider.</p>
-                  </div>
-                ) : (
-                  <div className="d-flex flex-column gap-4">
-                    {reviews.map((review) => (
-                      <div key={review.id} className="p-4 rounded-4" style={{ border: '1px solid var(--app-border)', background: 'var(--app-surface)' }}>
-                        <div className="d-flex align-items-start gap-3">
-                          {/* Reviewer Avatar */}
-                          <div 
-                            className="flex-shrink-0 rounded-circle d-flex align-items-center justify-content-center text-primary font-body fw-bold" 
-                            style={{ width: '48px', height: '48px', background: 'rgba(242, 122, 33, 0.1)', fontSize: '1.1rem' }}
-                          >
-                            {getInitials(review.customerName, "")}
-                          </div>
+                  <button
+                    className="btn btn-gradient-warm w-100 rounded-pill py-3 font-body fw-bold mb-4 shadow-warm"
+                    onClick={handleBooking}
+                  >
+                    <i className="fas fa-calendar-alt me-2"></i>
+                    Book Appointment
+                  </button>
 
-                          <div className="flex-grow-1">
-                            <div className="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center mb-2">
-                              <h6 className="font-display fw-bold text-dark mb-1 mb-sm-0">
-                                {review.customerName || "Customer"}
-                              </h6>
-                              <span className="text-secondary font-body small">
-                                {new Date(review.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
-                              </span>
-                            </div>
+                  <hr style={{ borderColor: 'var(--app-border)' }} />
 
-                            <div className="mb-2">
-                              {Array.from({ length: 5 }, (_, i) => (
-                                <i
-                                  key={i}
-                                  className={`me-1 ${
-                                    i < review.rating ? "fas fa-star" : "far fa-star"
-                                  }`}
-                                  style={{ color: i < review.rating ? 'var(--app-primary)' : '#e4e5e9', fontSize: '0.9rem' }}
-                                ></i>
-                              ))}
-                            </div>
-
-                            <p className="text-secondary font-body mb-0" style={{ lineHeight: '1.6' }}>
-                              {review.comment}
-                            </p>
-                          </div>
-                        </div>
+                  <div className="d-flex flex-column gap-4 mt-4 font-body">
+                    <div className="d-flex align-items-center gap-3">
+                      <div className="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style={{ width: '45px', height: '45px', background: 'rgba(242, 122, 33, 0.1)', color: 'var(--app-primary)' }}>
+                        <i className="fas fa-phone"></i>
                       </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* Sidebar / Booking Column */}
-          <div className="col-lg-4">
-            <div className="card app-card border-0 rounded-4 shadow-sm bg-white" style={{ position: 'sticky', top: '100px' }}>
-              <div className="card-body p-4 p-lg-5">
-                <h4 className="font-display fw-bold text-dark mb-4 text-center">
-                  Book {provider.firstName}
-                </h4>
-
-                <button
-                  className="btn btn-gradient-warm w-100 rounded-pill py-3 font-body fw-bold mb-4 shadow-warm"
-                  onClick={handleBooking}
-                >
-                  <i className="fas fa-calendar-alt me-2"></i>
-                  Book Appointment
-                </button>
-
-                <hr style={{ borderColor: 'var(--app-border)' }} />
-
-                <div className="d-flex flex-column gap-4 mt-4 font-body">
-                  <div className="d-flex align-items-center gap-3">
-                    <div className="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style={{ width: '45px', height: '45px', background: 'rgba(242, 122, 33, 0.1)', color: 'var(--app-primary)' }}>
-                      <i className="fas fa-phone"></i>
+                      <div>
+                        <p className="text-secondary small mb-0 fw-medium">Phone</p>
+                        <p className="text-dark fw-bold mb-0">{provider.phoneNumber || "Not provided"}</p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-secondary small mb-0 fw-medium">Phone</p>
-                      <p className="text-dark fw-bold mb-0">{provider.phoneNumber || "Not provided"}</p>
+
+                    <div className="d-flex align-items-center gap-3">
+                      <div className="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style={{ width: '45px', height: '45px', background: 'rgba(242, 122, 33, 0.1)', color: 'var(--app-primary)' }}>
+                        <i className="fas fa-envelope"></i>
+                      </div>
+                      <div style={{ wordBreak: 'break-word' }}>
+                        <p className="text-secondary small mb-0 fw-medium">Email</p>
+                        <p className="text-dark fw-bold mb-0">{provider.email || "Not provided"}</p>
+                      </div>
+                    </div>
+
+                    <div className="d-flex align-items-center gap-3">
+                      <div className="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style={{ width: '45px', height: '45px', background: 'rgba(242, 122, 33, 0.1)', color: 'var(--app-primary)' }}>
+                        <i className="fas fa-map-marker-alt"></i>
+                      </div>
+                      <div>
+                        <p className="text-secondary small mb-0 fw-medium">Service Area</p>
+                        <p className="text-dark fw-bold mb-0">
+                          {[provider.area, provider.city].filter(Boolean).join(", ") || "Location not set"}
+                        </p>
+                      </div>
                     </div>
                   </div>
 
-                  <div className="d-flex align-items-center gap-3">
-                    <div className="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style={{ width: '45px', height: '45px', background: 'rgba(242, 122, 33, 0.1)', color: 'var(--app-primary)' }}>
-                      <i className="fas fa-envelope"></i>
-                    </div>
-                    <div style={{ wordBreak: 'break-word' }}>
-                      <p className="text-secondary small mb-0 fw-medium">Email</p>
-                      <p className="text-dark fw-bold mb-0">{provider.email || "Not provided"}</p>
-                    </div>
-                  </div>
-
-                  <div className="d-flex align-items-center gap-3">
-                    <div className="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style={{ width: '45px', height: '45px', background: 'rgba(242, 122, 33, 0.1)', color: 'var(--app-primary)' }}>
-                      <i className="fas fa-map-marker-alt"></i>
-                    </div>
-                    <div>
-                      <p className="text-secondary small mb-0 fw-medium">Service Area</p>
-                      <p className="text-dark fw-bold mb-0">
-                        {[provider.area, provider.city].filter(Boolean).join(", ") || "Location not set"}
-                      </p>
-                    </div>
-                  </div>
                 </div>
-
               </div>
             </div>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
+    </>
   );
 };
 

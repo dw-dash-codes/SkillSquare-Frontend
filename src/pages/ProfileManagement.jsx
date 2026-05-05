@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import api from "../services/api";
 import { useNavigate } from "react-router-dom";
 import ModalAlert from "../components/ModalAlert";
+import { Link } from "react-router-dom";
 
 const PROFILE_API = "/User/profile";
 const UPDATE_PROFILE_API = "/User/profile";
@@ -133,18 +134,21 @@ const ProfileManagement = () => {
         />
       )}
 
-      <section className="app-section bg-light min-vh-100 py-5" style={{ paddingTop: '110px' }}>
+      <section className="app-section bg-light min-vh-100 py-5 mt-5" style={{ paddingTop: '110px' }}>
         <div className="container">
           <div className="row justify-content-center">
             {/* Centered Profile Form */}
             <div className="col-md-10 col-lg-8 col-xl-7">
               
-              <div className="text-center mb-5">
+              <div className="mb-5">
+                <Link to="/" className="text-decoration-none text-secondary font-body small hover-primary mb-3 d-inline-block">
+              <i className="fas fa-arrow-left me-2"></i> Back to Home
+            </Link>
                 <h1 className="font-display fw-bold text-dark mb-2">
                   <i className="fas fa-user-circle me-2" style={{ color: 'var(--app-primary)' }}></i>
                   Profile Management
                 </h1>
-                <p className="text-secondary font-body mb-0 mx-auto" style={{ maxWidth: '600px' }}>
+                <p className="text-secondary font-body mb-0 " style={{ maxWidth: '600px' }}>
                   Manage your personal information and keep your details up to date.
                 </p>
               </div>

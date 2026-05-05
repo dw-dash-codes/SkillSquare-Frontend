@@ -62,8 +62,8 @@ const TechnitianByCategory = () => {
     <section className="app-section bg-light min-vh-100" style={{ paddingTop: '120px' }}>
       <div className="container">
         <div className="mb-5">
-          <Link to="/categories" className="text-decoration-none text-secondary font-body small hover-primary mb-3 d-inline-block">
-            <i className="fas fa-arrow-left me-2"></i> Back to Categories
+          <Link onClick={() => navigate(-1)} className="text-decoration-none text-secondary font-body small hover-primary mb-3 d-inline-block">
+            <i className="fas fa-arrow-left me-2"></i> Back
           </Link>
           <h1 className="font-display fw-bold text-dark mb-2">
             {categoryName || "Technicians Near You"}

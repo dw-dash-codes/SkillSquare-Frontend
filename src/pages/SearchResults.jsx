@@ -42,7 +42,7 @@ const SearchResults = () => {
     <section className="app-section bg-light min-vh-100" style={{ paddingTop: '120px' }}>
       <div className="container">
         <div className="mb-5">
-          <Link to="/" className="text-decoration-none text-secondary font-body small hover-primary mb-3 d-inline-block">
+          <Link onClick={() => navigate(-1)} className="text-decoration-none text-secondary font-body small hover-primary mb-3 d-inline-block">
             <i className="fas fa-arrow-left me-2"></i> Back to Home
           </Link>
           <h1 className="font-display fw-bold text-dark mb-2">

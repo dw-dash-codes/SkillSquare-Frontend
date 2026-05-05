@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import api from "../services/api";
+import { Link } from "react-router-dom"; // Link import add kiya hai
 
 const UserBookings = () => {
   const [bookings, setBookings] = useState([]);
@@ -34,19 +35,25 @@ const UserBookings = () => {
   };
 
   return (
-    <section className="app-section bg-light min-vh-100 py-5" style={{ paddingTop: '110px' }}>
+    <section className="app-section bg-light min-vh-100 " style={{ paddingTop: '110px' }}>
       <div className="container">
-        <div className="text-center mb-5">
-          <h1 className="font-display fw-bold text-dark mb-2">
-            <i className="fas fa-calendar-alt me-2" style={{ color: 'var(--app-primary)' }}></i>
-            My Bookings
-          </h1>
-          <p className="text-secondary font-body mb-0 mx-auto" style={{ maxWidth: '600px' }}>
-            Manage and track all your booked services in one place.
-          </p>
-        </div>
+        
+        <div className="mx-auto" >
+          
+          <div className="mb-5">
+            <Link to="/" className="text-decoration-none text-secondary font-body small hover-primary mb-3 d-inline-block">
+              <i className="fas fa-arrow-left me-2"></i> Back to Home
+            </Link>
+            <h1 className="font-display fw-bold text-dark mb-2">
+              <i className="" style={{ color: 'var(--app-primary)' }}></i>
+              My Bookings
+            </h1>
+            <p className="text-secondary font-body mb-0">
+              Manage and track all your booked services in one place.
+            </p>
+          </div>
 
-        <div className="mx-auto" style={{ maxWidth: '900px' }}>
+          {/* Bookings Content */}
           {loading ? (
             <div className="text-center py-5">
               <div className="spinner-border text-primary mb-3" role="status"></div>
