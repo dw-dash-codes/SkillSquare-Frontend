@@ -1,10 +1,8 @@
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Playfair+Display:wght@600;700;800&display=swap');
 
 :root {
-  /* 2. Update your existing primary color to Lovable's Warm Color */
-  --app-primary: #f27a21; /* Blue ki jagah ye warm orange use hoga */
+  --app-primary: #f27a21; 
   
-  /* 3. Add Lovable Specific Variables */
   --font-display: 'Playfair Display', serif;
   --font-body: 'DM Sans', sans-serif;
   --gradient-warm: linear-gradient(135deg, #f27a21 0%, #f69d3c 100%);
@@ -12,7 +10,6 @@
   --app-text: #1a1512; /* Slightly warmer dark text */
 }
 
-/* 4. Apply Fonts Globally */
 body {
   font-family: var(--font-body) !important;
 }
@@ -21,7 +18,6 @@ h1, h2, h3, h4, h5, h6, .font-display, .navbar-brand {
   font-family: var(--font-display) !important;
 }
 
-/* 5. Utility class for gradient buttons (Jo hum Navbar me use karenge) */
 .btn-gradient-warm {
   background: var(--gradient-warm);
   color: #fff !important;
@@ -196,9 +192,7 @@ body {
 }
 
 @media (max-width: 991.98px) {
-  .app-main {
-    padding-top: 78px;
-  }
+  
 
   .app-navbar .navbar-collapse {
     margin-top: 1rem;

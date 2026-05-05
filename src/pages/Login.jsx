@@ -8,6 +8,7 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -16,7 +17,7 @@ const Login = () => {
     setSubmitting(true);
 
     try {
-      const data = await loginUser({ email, password });
+      const data = await loginUser({ email, password , rememberMe });
 
       if (data.token) {
         const decoded = jwtDecode(data.token);
@@ -43,14 +44,14 @@ const Login = () => {
         }
       }
     } catch (error) {
-      setError(error.message || "Login failed. Please check your credentials.");
+      setError("Login failed. Please check your credentials.");
     } finally {
       setSubmitting(false);
     }
   };
 
   return (
-    <section className="app-section bg-light min-vh-100 d-flex align-items-center py-5" style={{ paddingTop: '100px' }}>
+    <section className="app-section bg-light d-flex align-items-center py-5" style={{ paddingTop: '100px' }}>
       <div className="container">
         <div className="row justify-content-center">
           {/* Centered Compact Card */}
@@ -116,12 +117,12 @@ const Login = () => {
                         className="form-check-input"
                         type="checkbox"
                         id="rememberMe"
+                        checked={rememberMe}
+                        onChange={(e) => setRememberMe(e.target.checked)}
+                        style={{ cursor: 'pointer' }}
                       />
-                      <label
-                        className="form-check-label text-secondary"
-                        htmlFor="rememberMe"
-                      >
-                        Remember me
+                      <label className="form-check-label text-secondary small font-body" htmlFor="rememberMe" style={{ cursor: 'pointer', userSelect: 'none' }}>
+                        Remember me for 30 days
                       </label>
                     </div>
 
