@@ -94,7 +94,7 @@ const ProviderSidebar = () => {
       <header className="provider-topbar d-lg-none bg-white shadow-sm">
         <div className="container-fluid d-flex align-items-center justify-content-between">
           <NavLink to="/provider" className="text-decoration-none d-flex align-items-center">
-            <img src="logo_wt_1.png" alt="Logo" style={{ height: '28px', width: 'auto', marginRight: '8px' }} />
+            <img src="/logo_wt_1.png" alt="Logo" style={{ height: '28px', width: 'auto', marginRight: '8px' }} />
             <span className="font-display fw-bold text-dark fs-5">
               SkillSquare
             </span>
@@ -130,7 +130,7 @@ const ProviderSidebar = () => {
           
           <div className={`provider-sidebar-brand d-flex align-items-center ${isCollapsed ? 'justify-content-center' : ''}`}>
             <img 
-              src="logo_wt_1.png" 
+              src="/logo_wt_1.png" 
               alt="Logo" 
               style={{ 
                 height: '32px', 
