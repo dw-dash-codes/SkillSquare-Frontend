@@ -39,10 +39,12 @@ import MyBookings from "./pages/Provider/MyBookings";
 import Profile from "./pages/Provider/Profile";
 import MyReviews from "./pages/Provider/MyReviews";
 import SearchResults from "./pages/SearchResults";
+import ScrollToTop from "./components/ScrollToTop";
 
 const App = () => {
   return (
     <BrowserRouter>
+      <ScrollToTop/>
       <Routes>
         {/* ================================================= */}
         {/* 1️⃣ MAIN WEBSITE AREA (Customer & Public Mix)      */}

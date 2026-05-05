@@ -19,6 +19,7 @@ const ProviderRegister = () => {
     skills: "",
   });
 
+  const [formErrors, setFormErrors] = useState({}); // Errors store karne ke liye
   const [categories, setCategories] = useState([]);
   const [categoriesLoading, setCategoriesLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -61,14 +62,67 @@ const ProviderRegister = () => {
       ...prev,
       [name]: value,
     }));
+
+    // Jab user type kare toh us field ka error hide ho jaye
+    if (formErrors[name]) {
+      setFormErrors((prev) => ({
+        ...prev,
+        [name]: "",
+      }));
+    }
   };
 
   const closeModal = () => {
     setModalConfig((prev) => ({ ...prev, isOpen: false }));
   };
 
+  // Client-Side Validation Logic
+  const validateForm = () => {
+    let errors = {};
+    let isValid = true;
+
+    if (!formData.firstName.trim()) errors.firstName = "First Name is required.";
+    if (!formData.lastName.trim()) errors.lastName = "Last Name is required.";
+    
+    if (!formData.email.trim()) {
+      errors.email = "Email Address is required.";
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      errors.email = "Please enter a valid email address.";
+    }
+
+    if (!formData.password) {
+      errors.password = "Password is required.";
+    } else {
+      const pwd = formData.password;
+      if (pwd.length < 6) errors.password = "Password must be at least 6 characters long.";
+      else if (!/(?=.*[a-z])/.test(pwd)) errors.password = "Password must contain at least one lowercase letter.";
+      else if (!/(?=.*[A-Z])/.test(pwd)) errors.password = "Password must contain at least one uppercase letter.";
+      else if (!/(?=.*\d)/.test(pwd)) errors.password = "Password must contain at least one number.";
+      else if (!/(?=.*[^a-zA-Z\d])/.test(pwd)) errors.password = "Password must contain at least one special character (e.g. @$!%*?&).";
+    }
+
+    if (!formData.phoneNumber.trim()) errors.phoneNumber = "Phone Number is required.";
+    if (!formData.city.trim()) errors.city = "City is required.";
+    if (!formData.area.trim()) errors.area = "Area is required.";
+    if (!formData.address.trim()) errors.address = "Address is required.";
+    if (!formData.categoryId) errors.categoryId = "Service Category is required.";
+
+    if (Object.keys(errors).length > 0) {
+      isValid = false;
+    }
+
+    setFormErrors(errors);
+    return isValid;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Pehle form validate karein
+    if (!validateForm()) {
+      return; // Agar error hai toh API call na bhejein
+    }
+
     setSubmitting(true);
 
     const payload = {
@@ -91,7 +145,7 @@ const ProviderRegister = () => {
         isOpen: true,
         type: "error",
         title: "Registration Failed",
-        message: error.message || "Kuch galat ho gaya, dobara try karein.",
+        message: error.message || "Something went wrong. Please try again.",
         actions: [{ label: "Try Again" }],
       });
     } finally {
@@ -114,9 +168,9 @@ const ProviderRegister = () => {
       <section className="app-section bg-light min-vh-100 d-flex align-items-center py-5" style={{ paddingTop: '100px' }}>
         <div className="container">
           <div className="row justify-content-center">
-            {/* Centered Compact Card (Slightly wider for Provider fields) */}
+            {/* Centered Compact Card - Removed app-card so it doesn't jump on hover */}
             <div className="col-md-10 mt-5 col-lg-8 col-xl-7 col-xxl-6">
-              <div className="card app-card border-0 rounded-4 shadow-lg bg-white">
+              <div className="card border-0 rounded-4 shadow-lg bg-white">
                 <div className="p-4 p-md-5">
                   <div className="text-center mb-4">
                     <span className="badge rounded-pill px-3 py-1 mb-2 fw-medium" style={{ background: 'rgba(242, 122, 33, 0.1)', color: 'var(--app-primary)' }}>
@@ -130,19 +184,28 @@ const ProviderRegister = () => {
                     </p>
                   </div>
 
-                  <form onSubmit={handleSubmit} className="font-body">
+                  {/* Summary Alert */}
+                  {Object.keys(formErrors).length > 0 && (
+                    <div className="alert alert-danger rounded-3 py-2 px-3 small font-body border-0 mb-4" style={{ background: '#fef2f2', color: '#ef4444' }}>
+                      <i className="fas fa-exclamation-circle me-2"></i>
+                      Please fix the highlighted errors before submitting.
+                    </div>
+                  )}
+
+                  <form onSubmit={handleSubmit} className="font-body" noValidate>
                     <div className="row g-3">
+                      
                       <div className="col-sm-6">
                         <label className="form-label fw-bold text-dark small mb-1">First Name</label>
                         <input
                           type="text"
                           name="firstName"
-                          className="form-control px-3 py-2 bg-light border-0 shadow-none"
+                          className={`form-control px-3 py-2 bg-light shadow-none ${formErrors.firstName ? 'is-invalid border-danger' : 'border-0'}`}
                           style={{ borderRadius: '0.75rem' }}
                           value={formData.firstName}
                           onChange={handleChange}
-                          required
                         />
+                        {formErrors.firstName && <div className="invalid-feedback d-block small">{formErrors.firstName}</div>}
                       </div>
 
                       <div className="col-sm-6">
@@ -150,12 +213,12 @@ const ProviderRegister = () => {
                         <input
                           type="text"
                           name="lastName"
-                          className="form-control px-3 py-2 bg-light border-0 shadow-none"
+                          className={`form-control px-3 py-2 bg-light shadow-none ${formErrors.lastName ? 'is-invalid border-danger' : 'border-0'}`}
                           style={{ borderRadius: '0.75rem' }}
                           value={formData.lastName}
                           onChange={handleChange}
-                          required
                         />
+                        {formErrors.lastName && <div className="invalid-feedback d-block small">{formErrors.lastName}</div>}
                       </div>
 
                       <div className="col-12">
@@ -163,12 +226,12 @@ const ProviderRegister = () => {
                         <input
                           type="email"
                           name="email"
-                          className="form-control px-3 py-2 bg-light border-0 shadow-none"
+                          className={`form-control px-3 py-2 bg-light shadow-none ${formErrors.email ? 'is-invalid border-danger' : 'border-0'}`}
                           style={{ borderRadius: '0.75rem' }}
                           value={formData.email}
                           onChange={handleChange}
-                          required
                         />
+                        {formErrors.email && <div className="invalid-feedback d-block small">{formErrors.email}</div>}
                       </div>
                       
                       <div className="col-sm-6">
@@ -176,12 +239,12 @@ const ProviderRegister = () => {
                         <input
                           type="password"
                           name="password"
-                          className="form-control px-3 py-2 bg-light border-0 shadow-none"
+                          className={`form-control px-3 py-2 bg-light shadow-none ${formErrors.password ? 'is-invalid border-danger' : 'border-0'}`}
                           style={{ borderRadius: '0.75rem' }}
                           value={formData.password}
                           onChange={handleChange}
-                          required
                         />
+                        {formErrors.password && <div className="invalid-feedback d-block small">{formErrors.password}</div>}
                       </div>
 
                       <div className="col-sm-6">
@@ -189,23 +252,22 @@ const ProviderRegister = () => {
                         <input
                           type="tel"
                           name="phoneNumber"
-                          className="form-control px-3 py-2 bg-light border-0 shadow-none"
+                          className={`form-control px-3 py-2 bg-light shadow-none ${formErrors.phoneNumber ? 'is-invalid border-danger' : 'border-0'}`}
                           style={{ borderRadius: '0.75rem' }}
                           value={formData.phoneNumber}
                           onChange={handleChange}
-                          required
                         />
+                        {formErrors.phoneNumber && <div className="invalid-feedback d-block small">{formErrors.phoneNumber}</div>}
                       </div>
 
                       <div className="col-12">
                         <label className="form-label fw-bold text-dark small mb-1">Service Category</label>
                         <select
-                          className="form-select px-3 py-2 bg-light border-0 shadow-none text-dark"
-                          style={{ borderRadius: '0.75rem' }}
                           name="categoryId"
+                          className={`form-select px-3 py-2 bg-light shadow-none text-dark ${formErrors.categoryId ? 'is-invalid border-danger' : 'border-0'}`}
+                          style={{ borderRadius: '0.75rem' }}
                           value={formData.categoryId}
                           onChange={handleChange}
-                          required
                           disabled={categoriesLoading || categories.length === 0}
                         >
                           <option value="">
@@ -215,13 +277,13 @@ const ProviderRegister = () => {
                               ? "No categories available"
                               : "Select Service Category"}
                           </option>
-
                           {categories.map((category) => (
                             <option key={category.id} value={category.id}>
                               {category.title}
                             </option>
                           ))}
                         </select>
+                        {formErrors.categoryId && <div className="invalid-feedback d-block small">{formErrors.categoryId}</div>}
                       </div>
 
                       <div className="col-sm-6">
@@ -229,11 +291,12 @@ const ProviderRegister = () => {
                         <input
                           type="text"
                           name="city"
-                          className="form-control px-3 py-2 bg-light border-0 shadow-none"
+                          className={`form-control px-3 py-2 bg-light shadow-none ${formErrors.city ? 'is-invalid border-danger' : 'border-0'}`}
                           style={{ borderRadius: '0.75rem' }}
                           value={formData.city}
                           onChange={handleChange}
                         />
+                        {formErrors.city && <div className="invalid-feedback d-block small">{formErrors.city}</div>}
                       </div>
 
                       <div className="col-sm-6">
@@ -241,11 +304,12 @@ const ProviderRegister = () => {
                         <input
                           type="text"
                           name="area"
-                          className="form-control px-3 py-2 bg-light border-0 shadow-none"
+                          className={`form-control px-3 py-2 bg-light shadow-none ${formErrors.area ? 'is-invalid border-danger' : 'border-0'}`}
                           style={{ borderRadius: '0.75rem' }}
                           value={formData.area}
                           onChange={handleChange}
                         />
+                        {formErrors.area && <div className="invalid-feedback d-block small">{formErrors.area}</div>}
                       </div>
 
                       <div className="col-12">
@@ -253,11 +317,12 @@ const ProviderRegister = () => {
                         <input
                           type="text"
                           name="address"
-                          className="form-control px-3 py-2 bg-light border-0 shadow-none"
+                          className={`form-control px-3 py-2 bg-light shadow-none ${formErrors.address ? 'is-invalid border-danger' : 'border-0'}`}
                           style={{ borderRadius: '0.75rem' }}
                           value={formData.address}
                           onChange={handleChange}
                         />
+                        {formErrors.address && <div className="invalid-feedback d-block small">{formErrors.address}</div>}
                       </div>
 
                       <div className="col-12">
@@ -276,10 +341,10 @@ const ProviderRegister = () => {
                       <div className="col-12">
                         <label className="form-label fw-bold text-dark small mb-1">Professional Bio</label>
                         <textarea
+                          name="bio"
                           className="form-control px-3 py-3 bg-light border-0 shadow-none"
                           style={{ borderRadius: '0.75rem', minHeight: '100px' }}
                           placeholder="Tell potential customers about your experience and skills..."
-                          name="bio"
                           value={formData.bio}
                           onChange={handleChange}
                           rows="3"
