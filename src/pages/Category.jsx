@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import api from "../services/api";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom"; // Link import add kiya hai
 
 const Category = () => {
   const [categories, setCategories] = useState([]);
@@ -30,11 +30,16 @@ const Category = () => {
   return (
     <section className="app-section bg-light min-vh-100" style={{ paddingTop: '120px' }}>
       <div className="container">
-        <div className="text-center mb-5">
-          <h1 className="font-display fw-bold text-dark mb-3">
+        
+        {/* Updated Header Section: Left Aligned with Back Button */}
+        <div className="mb-5">
+          <Link to="/" className="text-decoration-none text-secondary font-body small hover-primary mb-3 d-inline-block">
+            <i className="fas fa-arrow-left me-2"></i> Back to Home
+          </Link>
+          <h1 className="font-display fw-bold text-dark mb-2">
             Service Directory
           </h1>
-          <p className="text-secondary font-body mb-0 mx-auto" style={{ maxWidth: '600px' }}>
+          <p className="text-secondary font-body mb-0">
             Discover all available service categories in your neighborhood and
             quickly connect with the right professional.
           </p>
@@ -70,7 +75,7 @@ const Category = () => {
                   style={{ transition: 'all 0.3s ease', cursor: 'pointer' }}
                 >
                   <div className="card-body p-4 p-lg-5 d-flex flex-column align-items-center justify-content-center">
-                    <div className="app-icon-circle mx-auto mb-3" style={{ width: '70px', height: '70px', fontSize: '1.8rem', background: 'rgba(242, 122, 33, 0.1)', color: 'var(--app-primary)' }}>
+                    <div className="app-icon-circle mx-auto mb-3 category-icon-hover" style={{ width: '70px', height: '70px', fontSize: '1.8rem', background: 'rgba(242, 122, 33, 0.1)', color: 'var(--app-primary)' }}>
                       <i className={cat.iconClass || "fas fa-tools"}></i>
                     </div>
                     <h5 className="font-body fw-bold mb-0 text-dark">{cat.title}</h5>
@@ -81,6 +86,7 @@ const Category = () => {
           )}
         </div>
 
+        {/* Bottom CTA Card */}
         <div className="text-center mt-5 pt-4">
           <div className="card app-card border-0 d-inline-block rounded-4 shadow-sm" style={{ maxWidth: '600px' }}>
             <div className="card-body p-4 p-md-5">
@@ -90,10 +96,11 @@ const Category = () => {
               <p className="text-secondary font-body mb-4">
                 Contact us and we’ll help you find the right professional for your needs.
               </p>
-              <a href="#contact" className="btn btn-outline-dark rounded-pill px-5 py-2 font-body fw-bold">
+              {/* Contact Us link updated to navigate to the new Contact page */}
+              <Link to="/contact" className="btn btn-outline-dark rounded-pill px-5 py-2 font-body fw-bold">
                 <i className="fas fa-envelope me-2"></i>
                 Contact Us
-              </a>
+              </Link>
             </div>
           </div>
         </div>

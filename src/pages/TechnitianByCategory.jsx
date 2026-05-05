@@ -83,7 +83,7 @@ const TechnitianByCategory = () => {
             {technicians.map((tech) => (
               <div key={tech.id || tech.providerId} className="col-lg-4 col-md-6">
                 <div 
-                  className="card app-card h-100 border rounded-4 text-start text-decoration-none d-flex flex-column bg-white shadow-sm"
+                  className="card provider_card h-100 border rounded-4 text-start text-decoration-none d-flex flex-column bg-white shadow-sm"
                   style={{ cursor: 'pointer', transition: 'all 0.3s ease', borderColor: 'var(--app-border)' }}
                   onClick={() => navigate(`/providerProfile/${tech.id || tech.providerId}`)}
                 >
@@ -120,7 +120,7 @@ const TechnitianByCategory = () => {
             ))}
           </div>
         ) : (
-          <div className="card app-card border-0 text-center p-5 rounded-4 shadow-sm" style={{ maxWidth: '600px', margin: '0 auto' }}>
+          <div className="card provider_card border-0 text-center p-5 rounded-4 shadow-sm" style={{ maxWidth: '600px', margin: '0 auto' }}>
             <div className="mb-4" style={{ fontSize: '3rem', color: 'var(--app-primary)', opacity: '0.5' }}>
               <i className="fas fa-user-slash"></i>
             </div>

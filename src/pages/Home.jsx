@@ -168,10 +168,16 @@ const Home = () => {
       {categories.length > 0 && (
         <section className="app-section bg-light" id="services" style={{ padding: '80px 0' }}>
           <div className="container">
-            <div className="mb-5">
+           <div className="d-flex flex-wrap justify-content-between align-items-end mb-5">
+            <div>
               <h2 className="font-display fw-bold text-dark mb-2">Browse by category</h2>
               <p className="text-secondary font-body mb-0">Find the right professional for your needs</p>
             </div>
+            
+            <Link to="/categories" className="btn btn-link text-decoration-none font-body text-dark fw-bold px-0 mt-3 mt-md-0 hover-primary">
+              View all <i className="fas fa-arrow-right ms-1 small"></i>
+            </Link>
+          </div>
 
             <div className="row g-4">
               {categories.slice(0, 6).map((category) => (
@@ -205,16 +211,13 @@ const Home = () => {
                 <h2 className="font-display fw-bold text-dark mb-2">Featured providers</h2>
                 <p className="text-secondary font-body mb-0">Top-rated professionals in your area</p>
               </div>
-              <Link to="/search-results" className="btn btn-link text-decoration-none font-body text-dark fw-bold px-0 mt-3 mt-md-0 hover-primary">
-                View all <i className="fas fa-arrow-right ms-1 small"></i>
-              </Link>
             </div>
 
             <div className="row g-4">
               {featuredProviders.map((provider) => (
                 <div key={provider.providerId} className="col-lg-4 col-md-6">
                   <div 
-                    className="card app-card h-100 border rounded-4 text-start text-decoration-none d-flex flex-column"
+                    className="card provider_card h-100 border rounded-4 text-start text-decoration-none d-flex flex-column"
                     style={{ cursor: 'pointer', transition: 'all 0.3s ease', borderColor: 'var(--app-border)' }}
                     onClick={() => navigate(`/providerProfile/${provider.providerId}`)}
                   >
