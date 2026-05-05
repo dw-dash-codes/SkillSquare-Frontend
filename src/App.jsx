@@ -40,6 +40,10 @@ import Profile from "./pages/Provider/Profile";
 import MyReviews from "./pages/Provider/MyReviews";
 import SearchResults from "./pages/SearchResults";
 import ScrollToTop from "./components/ScrollToTop";
+import AboutUs from "./pages/AboutUs";
+import ContactUs from "./pages/ContactUs";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsOfService from "./pages/TermsOfService";
 
 const App = () => {
   return (
@@ -57,6 +61,10 @@ const App = () => {
           <Route path="login" element={<Login />} />
           <Route path="providerRegister" element={<ProviderRegister />} />
           <Route path="userRegister" element={<UserRegister />} />
+          <Route path="/about" element={<AboutUs />} />
+          <Route path="/contact" element={<ContactUs />} />
+          <Route path="/privacy" element={<PrivacyPolicy />} />
+          <Route path="/terms" element={<TermsOfService/>} />
           <Route
             path="technitians-by-category/:categoryId"
             element={<TechnitianByCategory />}
