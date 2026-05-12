@@ -126,9 +126,9 @@ const Login = () => {
                       </label>
                     </div>
 
-                    <a href="#" className="text-decoration-none hover-primary" style={{ color: 'var(--app-primary)' }}>
+                    {/* <a href="#" className="text-decoration-none hover-primary" style={{ color: 'var(--app-primary)' }}>
                       Forgot password?
-                    </a>
+                    </a> */}
                   </div>
 
                   <button

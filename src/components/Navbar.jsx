@@ -203,7 +203,7 @@ const Navbar = () => {
           {/* Lovable Style Text Logo */}
           <NavLink to="/" className="navbar-brand d-flex align-items-center">
             <img 
-              src="hero_logo_1.png" 
+              src="/hero_logo_1.png" 
               alt="SkillSquare" 
               style={{ height: '40px', width: 'auto', objectFit: 'cover' }} 
             />

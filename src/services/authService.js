@@ -18,7 +18,7 @@ export const registerProvider = async (userData) =>{
   } catch (error) {
     throw error.response?.data || "Registration failed";
   }
-}
+};
 
 // ✅ Login (Customer, Provider, Admin sab ke liye)
 export const loginUser = async (credentials) => {

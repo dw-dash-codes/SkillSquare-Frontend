@@ -19,7 +19,7 @@ const ProviderRegister = () => {
     skills: "",
   });
 
-  const [formErrors, setFormErrors] = useState({}); // Errors store karne ke liye
+  const [formErrors, setFormErrors] = useState({}); 
   const [categories, setCategories] = useState([]);
   const [categoriesLoading, setCategoriesLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -63,7 +63,7 @@ const ProviderRegister = () => {
       [name]: value,
     }));
 
-    // Jab user type kare toh us field ka error hide ho jaye
+
     if (formErrors[name]) {
       setFormErrors((prev) => ({
         ...prev,
@@ -76,7 +76,7 @@ const ProviderRegister = () => {
     setModalConfig((prev) => ({ ...prev, isOpen: false }));
   };
 
-  // Client-Side Validation Logic
+
   const validateForm = () => {
     let errors = {};
     let isValid = true;
@@ -118,9 +118,9 @@ const ProviderRegister = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Pehle form validate karein
+ 
     if (!validateForm()) {
-      return; // Agar error hai toh API call na bhejein
+      return; 
     }
 
     setSubmitting(true);

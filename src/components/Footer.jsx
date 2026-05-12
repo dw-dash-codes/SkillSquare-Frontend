@@ -49,7 +49,7 @@ const Footer = () => {
           <div className="col-lg-5 col-md-12 pe-lg-4">
             <NavLink className="align-items-center text-decoration-none mb-4" to="/">
                 <img 
-                  src="hero_logo_1.png" 
+                  src="/hero_logo_1.png" 
                   alt="SkillSquare" 
                   style={{ height: '40px', width: 'auto', objectFit: 'contain' }} 
                 />

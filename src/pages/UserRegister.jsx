@@ -18,7 +18,6 @@ const UserRegister = () => {
     city: "",
   });
 
-  // Nayi state errors ko store karne ke liye
   const [formErrors, setFormErrors] = useState({});
 
   const [modalConfig, setModalConfig] = useState({
@@ -35,7 +34,6 @@ const UserRegister = () => {
       [e.target.name]: e.target.value,
     });
     
-    // Jab user type karna shuru kare toh uss field ka error hat jaye
     if (formErrors[e.target.name]) {
       setFormErrors({
         ...formErrors,
@@ -48,7 +46,16 @@ const UserRegister = () => {
     setModalConfig((prev) => ({ ...prev, isOpen: false }));
   };
 
-  // Client-Side Validation Logic
+  const checkEmailAvailability = async () => {
+    if (!formData.email.trim() || !/\S+@\S+\.\S+/.test(formData.email)) return;
+
+    try {
+      
+    } catch (error) {
+      console.error("Error checking email availability:", error);
+    }
+  };
+
   const validateForm = () => {
     let errors = {};
     let isValid = true;
@@ -88,9 +95,8 @@ const UserRegister = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Pehle client-side validation check karein
     if (!validateForm()) {
-      return; // Agar error hai toh yahin rok dein, API call nahi hogi
+      return;
     }
 
     setLoading(true);
@@ -114,20 +120,49 @@ const UserRegister = () => {
         ],
       });
     } catch (error) {
-      console.error(error);
+      console.error("Registration Error:", error);
 
-      setModalConfig({
-        isOpen: true,
-        type: "error",
-        title: "Registration Failed",
-        message:
-          error.message ||
-          error.response?.data ||
-          "Something went wrong. Please try again.",
-        actions: [{ label: "Try Again" }],
-      });
+      let errorString = "";
+      let displayMessage = "Something went wrong. Please try again.";
+
+      
+      if (typeof error === "string") {
+        errorString = error.toLowerCase();
+        displayMessage = error;
+      } 
+
+      else if (error?.response?.data) {
+        if (typeof error.response.data === "string") {
+          errorString = error.response.data.toLowerCase();
+          displayMessage = error.response.data;
+        } else {
+          errorString = JSON.stringify(error.response.data).toLowerCase();
+          displayMessage = error.response.data.title || error.response.data.message || displayMessage;
+        }
+      } 
+   
+      else if (error?.message) {
+        errorString = error.message.toLowerCase();
+        displayMessage = error.message;
+      }
+
+
+      if (errorString.includes("taken") || errorString.includes("already") || errorString.includes("duplicate")) {
+        setFormErrors((prev) => ({
+          ...prev,
+          email: "This email is already registered. Please try logging in.",
+        }));
+      } else {
+        setModalConfig({
+          isOpen: true,
+          type: "error",
+          title: "Registration Failed",
+          message: displayMessage,
+          actions: [{ label: "Try Again" }],
+        });
+      }
     } finally {
-      setLoading(false);
+      setLoading(false); 
     }
   };
 
@@ -146,7 +181,6 @@ const UserRegister = () => {
       <section className="app-section bg-light min-vh-100 d-flex align-items-center py-5" style={{ paddingTop: '100px' }}>
         <div className="container">
           <div className="row justify-content-center">
-            {/* Centered Compact Card */}
             <div className="col-md-8 mt-5 col-lg-7 col-xl-6 col-xxl-5">
               <div className="card border-0 rounded-4 shadow-lg bg-white">
                 <div className="p-4 p-md-5">
@@ -159,7 +193,6 @@ const UserRegister = () => {
                     </p>
                   </div>
 
-                  {/* General Error Summary Top par (Optional, but useful) */}
                   {Object.keys(formErrors).length > 0 && (
                     <div className="alert alert-danger rounded-3 py-2 px-3 small font-body border-0 mb-4" style={{ background: '#fef2f2', color: '#ef4444' }}>
                       <i className="fas fa-exclamation-circle me-2"></i>
@@ -204,6 +237,7 @@ const UserRegister = () => {
                           style={{ borderRadius: '0.75rem' }}
                           value={formData.email}
                           onChange={handleChange}
+                          onBlur={checkEmailAvailability}
                         />
                         {formErrors.email && <div className="invalid-feedback d-block small">{formErrors.email}</div>}
                       </div>
