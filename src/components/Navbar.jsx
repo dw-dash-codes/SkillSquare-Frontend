@@ -27,7 +27,7 @@ const Navbar = () => {
     e.preventDefault();
     if (searchQuery.trim()) {
       // Routing to your existing categories/services page with search param
-      navigate(`/categories?search=${encodeURIComponent(searchQuery.trim())}`);
+      navigate(`/search-results?query=${encodeURIComponent(searchQuery.trim())}`);
       setSearchQuery("");
     }
   };
